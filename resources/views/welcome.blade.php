@@ -6,6 +6,9 @@
     <meta name="description" content="KerjaKita - Platform Pencarian Kerja Serabutan Terpercaya di Indonesia">
     <title>KerjaKita - Temukan Pekerja & Pekerjaan dengan Mudah</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/LOGO.png') }}">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -155,6 +158,39 @@
             opacity: 0.3;
             transition: 0s;
         }
+        .btn-ripple:active::after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
+        }
+
+        /* --- NAVBAR DYNAMIC COLORS START --- */
+        #navbar .nav-link, 
+        #navbar .login-link, 
+        #navbar .logo-text,
+        #navbar .mobile-toggle {
+            transition: all 0.3s ease;
+        }
+
+        /* Keadaan di Puncak (Background Transparan - Tulisan Putih) */
+        #navbar:not(.navbar-scrolled) .nav-link {
+            color: #ffffff !important;
+        }
+        #navbar:not(.navbar-scrolled) .nav-link:hover {
+            color: #fbbf24 !important; /* Amber-400 */
+        }
+        #navbar:not(.navbar-scrolled) .login-link {
+            color: #ffffff !important;
+        }
+        #navbar:not(.navbar-scrolled) .logo-text {
+            background: none !important;
+            -webkit-text-fill-color: #ffffff !important;
+            color: #ffffff !important;
+        }
+        #navbar:not(.navbar-scrolled) .mobile-toggle {
+            color: #ffffff !important;
+        }
+        /* --- NAVBAR DYNAMIC COLORS END --- */
     </style>
 </head>
 <body class="bg-gray-50">
@@ -165,26 +201,26 @@
             <div class="flex items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3" data-aos="fade-right">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-briefcase text-white text-xl"></i>
+                    <div class="flex items-center justify-center">
+                        <img src="{{ asset('images/LOGO.png') }}" alt="Logo KerjaKita" class="w-12 h-12 object-contain">
                     </div>
-                    <span class="text-2xl font-bold font-poppins gradient-text">KerjaKita</span>
+                    <span class="text-2xl font-bold font-poppins gradient-text logo-text">KerjaKita</span>
                 </div>
                 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8" data-aos="fade-down">
-                    <a href="#beranda" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Beranda</a>
-                    <a href="#fitur" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Fitur</a>
-                    <a href="#kategori" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Kategori</a>
-                    <a href="#tentang" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Tentang</a>
-                    <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-700 font-semibold transition-colors">Login</a>
+                    <a href="#beranda" class="text-gray-700 hover:text-blue-600 transition-colors font-medium nav-link">Beranda</a>
+                    <a href="#fitur" class="text-gray-700 hover:text-blue-600 transition-colors font-medium nav-link">Fitur</a>
+                    <a href="#kategori" class="text-gray-700 hover:text-blue-600 transition-colors font-medium nav-link">Kategori</a>
+                    <a href="#tentang" class="text-gray-700 hover:text-blue-600 transition-colors font-medium nav-link">Tentang</a>
+                    <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-700 font-semibold transition-colors login-link">Login</a>
                     <a href="{{ route('register') }}" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2.5 rounded-full hover:shadow-lg transition-all shine btn-ripple font-semibold">
                         Daftar Sekarang
                     </a>
                 </div>
                 
                 <!-- Mobile Menu Button -->
-                <button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button">
+                <button class="md:hidden text-gray-700 focus:outline-none mobile-toggle" id="mobile-menu-button">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
             </div>
@@ -279,10 +315,21 @@
             </div>
         </div>
         
-        <!-- Wave Shape Divider - SMOOTH & RESPONSIVE -->
-        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none transform translate-y-px">
-            <svg class="relative block w-full h-16 md:h-20 lg:h-24" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" 
+        <!-- Wave Shape Divider - Smooth Transition -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
+            <svg class="relative block w-full h-24 md:h-32" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <!-- Layer 1: Subtle gradient wave -->
+                <path d="M0,0 L0,40 Q300,60 600,40 T1200,40 L1200,0 Z" 
+                      fill="#1D4ED8" 
+                      opacity="0.3"></path>
+                
+                <!-- Layer 2: Mid transition wave -->
+                <path d="M0,20 L0,60 Q300,80 600,60 T1200,60 L1200,20 Z" 
+                      fill="#2563EB" 
+                      opacity="0.5"></path>
+                
+                <!-- Layer 3: Main wave -->
+                <path d="M0,40 L0,80 Q300,100 600,80 T1200,80 L1200,120 L0,120 Z" 
                       fill="#F9FAFB"></path>
             </svg>
         </div>
@@ -616,7 +663,7 @@
             </div>
             
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2025 KerjaKita. All rights reserved. Made with <i class="fas fa-heart text-red-500"></i> in Indonesia</p>
+                <p>&copy; 2025 KerjaKita. All rights reserved. Kelompok 1-RPL 2</p>
             </div>
         </div>
     </footer>

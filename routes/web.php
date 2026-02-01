@@ -21,7 +21,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Dashboard Routes (protected by auth middleware)
-Route::middleware(['auth'])->group(function () {
+// Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         // Redirect based on user role
         if (auth()->user()->peran === 'PemberiKerja') {
@@ -48,4 +48,4 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/lowongan/{id}/lamar', [App\Http\Controllers\LamaranController::class, 'lamar'])->name('lowongan.lamar');
         Route::get('/lamaran', [App\Http\Controllers\LamaranController::class, 'index'])->name('lamaran.index');
     });
-});
+// });
