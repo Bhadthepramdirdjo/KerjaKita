@@ -159,7 +159,8 @@ INSERT INTO `kategori` (`id_kategori`, `nama_kategori`, `deskripsi`, `created_at
 (5, 'Angkut Barang', 'Pekerjaan pindahan dan angkut barang', '2026-02-01 07:01:15'),
 (6, 'Perbaikan', 'Pekerjaan service AC, elektronik, dll', '2026-02-01 07:01:15'),
 (7, 'Jaga Toko', 'Pekerjaan menjaga toko atau warung', '2026-02-01 07:01:15'),
-(8, 'Cuci Kendaraan', 'Pekerjaan mencuci motor atau mobil', '2026-02-01 07:01:15');
+(8, 'Cuci Kendaraan', 'Pekerjaan mencuci motor atau mobil', '2026-02-01 07:01:15'),
+(9, 'Digital', 'Pekerjaan digital seperti desain, programming, dll', '2026-02-01 16:08:29');
 
 -- --------------------------------------------------------
 

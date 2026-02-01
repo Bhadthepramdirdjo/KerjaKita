@@ -54,11 +54,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     // Pemberi Kerja Routes (Temporary without auth for testing)
     Route::prefix('pemberi-kerja')->name('pemberi-kerja.')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\PemberiKerjaController::class, 'dashboard'])->name('dashboard');
-        Route::get('/lowongan', [App\Http\Controllers\LowonganController::class, 'index'])->name('lowongan.index');
-        Route::get('/lowongan/create', [App\Http\Controllers\LowonganController::class, 'create'])->name('lowongan.create');
-        Route::post('/lowongan', [App\Http\Controllers\LowonganController::class, 'store'])->name('lowongan.store');
-        Route::get('/lowongan/{id}', [App\Http\Controllers\LowonganController::class, 'show'])->name('lowongan.show');
-        Route::get('/lowongan/{id}/pelamar', [App\Http\Controllers\LamaranController::class, 'pelamar'])->name('lowongan.pelamar');
+        Route::get('/buat-lowongan', [App\Http\Controllers\PemberiKerjaController::class, 'buatLowongan'])->name('buat-lowongan');
+        Route::post('/simpan-lowongan', [App\Http\Controllers\PemberiKerjaController::class, 'simpanLowongan'])->name('simpan-lowongan');
+        Route::get('/rekomendasi-pekerja', [App\Http\Controllers\PemberiKerjaController::class, 'rekomendasiPekerja'])->name('rekomendasi-pekerja');
         Route::get('/pengaturan', [App\Http\Controllers\PemberiKerjaController::class, 'pengaturan'])->name('pengaturan');
     });
 // });

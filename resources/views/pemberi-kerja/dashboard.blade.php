@@ -95,13 +95,13 @@
                 </button>
             </div>
 
-            <!-- "Pasang Lowongan" Button (Essential Feature) -->
-            <a href="{{ route('pemberi-kerja.lowongan.create') }}" class="hidden md:flex bg-white border-2 border-keel-black px-6 py-2 rounded-full font-bold hover:bg-seafoam-bloom transition-colors items-center gap-2 shadow-sm whitespace-nowrap">
+            <!-- "Pasang Lowongan" Button            <!-- Desktop Add Button -->
+            <a href="{{ route('pemberi-kerja.buat-lowongan') }}" class="hidden md:flex items-center gap-2 bg-keel-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition-colors font-semibold">
                 <i class="fas fa-plus"></i> Pasang Lowongan
             </a>
 
             <!-- Mobile Add Button -->
-            <a href="{{ route('pemberi-kerja.lowongan.create') }}" class="md:hidden w-10 h-10 rounded-full bg-keel-black text-white flex items-center justify-center hover:bg-gray-800">
+            <a href="{{ route('pemberi-kerja.buat-lowongan') }}" class="md:hidden w-10 h-10 rounded-full bg-keel-black text-white flex items-center justify-center hover:bg-gray-800">
                 <i class="fas fa-plus"></i>
             </a>
 

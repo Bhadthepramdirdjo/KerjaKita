@@ -69,4 +69,30 @@ class PemberiKerjaController extends Controller
     {
         return view('pemberi-kerja.pengaturan');
     }
+    
+    /**
+     * Halaman Form Buat Lowongan
+     */
+    public function buatLowongan()
+    {
+        return view('pemberi-kerja.lowongan.buat-lowongan');
+    }
+    
+    /**
+     * Simpan Lowongan Baru
+     */
+    public function simpanLowongan(Request $request)
+    {
+        // TODO: Implementasi simpan lowongan
+        // Validasi, upload gambar, simpan ke database
+        return redirect()->route('pemberi-kerja.dashboard')->with('success', 'Lowongan berhasil dibuat!');
+    }
+    
+    /**
+     * Halaman Rekomendasi Pekerja
+     */
+    public function rekomendasiPekerja()
+    {
+        return view('pemberi-kerja.rekomendasi-pekerja');
+    }
 }
