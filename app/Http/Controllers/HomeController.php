@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * HomeController - FIXED VERSION
- * 
+ *
  * Controller untuk menangani halaman-halaman publik
  * Bug Fix: Removed 'icon' column yang tidak ada di database
  */
@@ -15,7 +15,7 @@ class HomeController extends Controller
 {
     /**
      * Menampilkan Landing Page (Homepage)
-     * 
+     *
      * Route: GET /
      * View: resources/views/welcome.blade.php
      */
@@ -28,13 +28,13 @@ class HomeController extends Controller
             'total_pemberi_kerja' => DB::table('PemberiKerja')->count(),
             'total_lamaran' => DB::table('Lamaran')->count(),
         ];
-        
+
         // Ambil kategori pekerjaan untuk section kategori
         // FIX: Removed 'icon' column karena tidak ada di tabel Kategori
         $categories = DB::table('Kategori')
             ->select('id_kategori', 'nama_kategori', 'deskripsi')
             ->get();
-        
+
         // Ambil lowongan terbaru untuk ditampilkan (opsional)
         $featured_jobs = DB::table('Lowongan')
             ->join('PemberiKerja', 'Lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
@@ -53,11 +53,11 @@ class HomeController extends Controller
             ->orderBy('Lowongan.created_at', 'desc')
             ->limit(6)
             ->get();
-        
+
         // Return view dengan data
         return view('welcome', compact('stats', 'categories', 'featured_jobs'));
     }
-    
+
     /**
      * Menampilkan Halaman Tentang Kami
      */
@@ -65,7 +65,7 @@ class HomeController extends Controller
     {
         return view('tentang');
     }
-    
+
     /**
      * Menampilkan Halaman Kontak
      */
@@ -73,7 +73,7 @@ class HomeController extends Controller
     {
         return view('kontak');
     }
-    
+
     /**
      * Proses Form Kontak
      */
@@ -85,12 +85,12 @@ class HomeController extends Controller
             'subjek' => 'required|max:255',
             'pesan' => 'required'
         ]);
-        
+
         // TODO: Implementasi logic kirim email atau simpan ke database
-        
+
         return redirect()->back()->with('success', 'Pesan Anda berhasil dikirim!');
     }
-    
+
     /**
      * Menampilkan Halaman FAQ
      */
@@ -110,10 +110,10 @@ class HomeController extends Controller
                 'jawaban' => 'Setelah login, cari lowongan yang sesuai, klik detail, lalu klik tombol "Lamar Sekarang".'
             ],
         ];
-        
+
         return view('faq', compact('faqs'));
     }
-    
+
     /**
      * Menampilkan Kebijakan Privasi
      */
@@ -121,7 +121,7 @@ class HomeController extends Controller
     {
         return view('kebijakan-privasi');
     }
-    
+
     /**
      * Menampilkan Syarat & Ketentuan
      */
