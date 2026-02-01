@@ -57,13 +57,13 @@
 </head>
 <body class="text-keel-black h-screen flex overflow-hidden">
 
-    <!-- Sidebar (Floating Style as per wireframe) -->
+    <!-- Sidebar (Floating Style) -->
     <aside class="w-20 lg:w-24 h-screen flex flex-col items-center py-8 z-50 fixed left-0 top-0 bg-white border-r border-gray-200 shadow-sm">
-        <!-- Logo / Top Icon -->
+        <!-- Settings Icon -->
         <div class="mb-auto">
-             <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
+             <a href="{{ route('pekerja.pengaturan') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-cog text-2xl"></i>
-            </button>
+            </a>
         </div>
         
         <!-- Center Icons -->
@@ -72,7 +72,8 @@
                 <i class="fas fa-home text-xl"></i>
             </button>
             
-            <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
+            <!-- Filter Toggle Button -->
+            <button id="filterToggle" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
         </div>
@@ -81,18 +82,101 @@
         <div class="mt-auto"></div>
     </aside>
 
+    <!-- Filter Sidebar (Slide Panel) -->
+    <div id="filterSidebar" class="fixed left-20 lg:left-24 top-0 h-screen w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-40 overflow-y-auto">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-keel-black">Filter Pekerjaan</h2>
+                <button id="closeFilter" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
+                    <i class="fas fa-times text-keel-black"></i>
+                </button>
+            </div>
+
+            <!-- Tipe Pekerjaan -->
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Tipe Pekerjaan</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center p-3 rounded-xl hover:bg-seafoam-bloom hover:bg-opacity-20 cursor-pointer transition-colors">
+                        <input type="checkbox" name="tipe[]" value="remote" class="w-4 h-4 text-pelagic-blue rounded focus:ring-pelagic-blue">
+                        <span class="ml-3 text-gray-700">Remote</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-xl hover:bg-seafoam-bloom hover:bg-opacity-20 cursor-pointer transition-colors">
+                        <input type="checkbox" name="tipe[]" value="onsite" class="w-4 h-4 text-pelagic-blue rounded focus:ring-pelagic-blue">
+                        <span class="ml-3 text-gray-700">On-Site</span>
+                    </label>
+                </div>
+            </div>
+
+            <hr class="my-6 border-gray-200">
+
+            <!-- Kategori -->
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Kategori</h3>
+                <div class="space-y-2">
+                    @php
+                        $kategori = DB::table('kategori')->get();
+                    @endphp
+                    @foreach($kategori as $kat)
+                    <label class="flex items-center p-3 rounded-xl hover:bg-seafoam-bloom hover:bg-opacity-20 cursor-pointer transition-colors">
+                        <input type="checkbox" name="kategori[]" value="{{ $kat->id_kategori }}" class="w-4 h-4 text-pelagic-blue rounded focus:ring-pelagic-blue">
+                        <span class="ml-3 text-gray-700">{{ $kat->nama_kategori }}</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <hr class="my-6 border-gray-200">
+
+            <!-- Lokasi -->
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Lokasi</h3>
+                <div class="space-y-2">
+                    @php
+                        $lokasi = DB::table('lowongan')
+                            ->select('lokasi')
+                            ->distinct()
+                            ->orderBy('lokasi')
+                            ->get();
+                    @endphp
+                    @foreach($lokasi as $lok)
+                    <label class="flex items-center p-3 rounded-xl hover:bg-seafoam-bloom hover:bg-opacity-20 cursor-pointer transition-colors">
+                        <input type="checkbox" name="lokasi[]" value="{{ $lok->lokasi }}" class="w-4 h-4 text-pelagic-blue rounded focus:ring-pelagic-blue">
+                        <span class="ml-3 text-gray-700">{{ $lok->lokasi }}</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="sticky bottom-0 bg-white pt-4 pb-2 space-y-3">
+                <button class="w-full bg-pelagic-blue hover:bg-abyss-teal text-white font-bold py-3 px-6 rounded-full transition-colors shadow-lg">
+                    <i class="fas fa-filter mr-2"></i>
+                    Terapkan Filter
+                </button>
+                <button class="w-full bg-gray-200 hover:bg-gray-300 text-keel-black font-semibold py-3 px-6 rounded-full transition-colors">
+                    <i class="fas fa-redo mr-2"></i>
+                    Reset Filter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="filterOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
+
     <!-- Main Content -->
     <main class="flex-1 ml-20 lg:ml-24 flex flex-col h-screen relative">
         
         <!-- Header Section -->
-        <header class="w-full px-6 py-6 flex items-center justify-between">
-            <!-- Back / Top Left Icon -->
-            <button class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100">
-                <i class="fas fa-chevron-up text-keel-black"></i>
-            </button>
+        <header class="w-full px-6 py-6 flex items-center gap-4">
+            <!-- Logo Icon (Top Left) -->
+            <div class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100 flex-shrink-0 p-1.5">
+                <img src="{{ asset('images/LOGO.png') }}" alt="KerjaKita Logo" class="w-full h-full object-contain">
+            </div>
 
             <!-- Search Bar -->
-            <div class="flex-1 max-w-2xl mx-6 relative">
+            <div class="flex-1 relative">
                 <input type="text" 
                        placeholder="Cari pekerjaan..." 
                        class="w-full bg-white border-2 border-keel-black rounded-full py-2 px-6 focus:outline-none focus:ring-2 focus:ring-pelagic-blue shadow-sm">
@@ -102,7 +186,7 @@
             </div>
 
             <!-- Profile Icon -->
-            <button class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50">
+            <button class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
                 <i class="far fa-user text-2xl text-keel-black"></i>
             </button>
         </header>
@@ -120,35 +204,37 @@
                 
                 @forelse($lowongan as $job)
                 <!-- Job Card Component -->
-                <div class="bg-keel-black rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1">
-                    <!-- Card Body -->
-                    <div class="p-6 h-48 flex flex-col relative">
-                        <!-- Decorative gradient overlay -->
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-pelagic-blue to-transparent opacity-20 rounded-bl-full"></div>
-                        
-                        <h3 class="text-white text-xl font-bold mb-2 z-10 line-clamp-1">{{ $job->judul }}</h3>
-                        <p class="text-gray-300 text-sm line-clamp-3 z-10 flex-grow">
-                            {{ $job->deskripsi }}
-                        </p>
-                    </div>
-
-                    <!-- Card Footer (Details) -->
-                    <div class="bg-[#1a2526] px-6 py-4 border-t border-gray-700">
-                        <div class="flex items-center justify-between text-white text-sm mb-2">
-                            <span class="font-medium text-seafoam-bloom">Bayaran :</span>
-                            <span class="font-bold">Rp {{ number_format($job->upah, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-white text-sm">
-                            <span class="text-gray-400">Durasi kerja: <span class="text-white">-</span></span> <!-- Durasi tidak ada di DB, strip dulu -->
+                <a href="{{ route('pekerja.lowongan.detail', $job->idLowongan) }}" class="block">
+                    <div class="bg-keel-black rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 cursor-pointer">
+                        <!-- Card Body -->
+                        <div class="p-6 h-48 flex flex-col relative">
+                            <!-- Decorative gradient overlay -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-pelagic-blue to-transparent opacity-20 rounded-bl-full"></div>
                             
-                            <!-- Location Icon/Text -->
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-gray-400">{{ Str::limit($job->lokasi, 15) }}</span>
-                                <i class="fas fa-map-marker-alt text-pelagic-blue"></i>
+                            <h3 class="text-white text-xl font-bold mb-2 z-10 line-clamp-1">{{ $job->judul }}</h3>
+                            <p class="text-gray-300 text-sm line-clamp-3 z-10 flex-grow">
+                                {{ $job->deskripsi }}
+                            </p>
+                        </div>
+
+                        <!-- Card Footer (Details) -->
+                        <div class="bg-[#1a2526] px-6 py-4 border-t border-gray-700">
+                            <div class="flex items-center justify-between text-white text-sm mb-2">
+                                <span class="font-medium text-seafoam-bloom">Bayaran :</span>
+                                <span class="font-bold">Rp {{ number_format($job->upah, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-white text-sm">
+                                <span class="text-gray-400">Durasi kerja: <span class="text-white">-</span></span>
+                                
+                                <!-- Location Icon/Text -->
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-400">{{ Str::limit($job->lokasi, 15) }}</span>
+                                    <i class="fas fa-map-marker-alt text-pelagic-blue"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
                 @empty
                 <!-- Empty State -->
                 <div class="col-span-full text-center py-20">
@@ -160,55 +246,35 @@
                 </div>
                 @endforelse
 
-                <!-- Dummy Data for Visual Check (If DB is empty) -->
-                <!-- You can remove this block later -->
-                <div class="bg-keel-black rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl">
-                    <div class="p-6 h-48 flex flex-col relative">
-                        <h3 class="text-white text-xl font-bold mb-2 z-10">Desain UI/UX App</h3>
-                        <p class="text-gray-300 text-sm line-clamp-3 z-10">
-                            Mencari desainer untuk membuat tampilan aplikasi mobile marketplace sederhana.
-                        </p>
-                    </div>
-                    <div class="bg-[#1a2526] px-6 py-4 border-t border-gray-700">
-                        <div class="flex items-center justify-between text-white text-sm mb-2">
-                            <span class="font-medium text-seafoam-bloom">Bayaran :</span>
-                            <span class="font-bold">Rp 500.000</span>
-                        </div>
-                        <div class="flex items-center justify-between text-white text-sm">
-                            <span class="text-gray-400">Durasi kerja: <span class="text-white">5 Jam</span></span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-gray-400">Remote</span>
-                                <i class="fas fa-wifi text-pelagic-blue"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-keel-black rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl">
-                    <div class="p-6 h-48 flex flex-col relative">
-                        <h3 class="text-white text-xl font-bold mb-2 z-10">Bersih Rumah Total</h3>
-                        <p class="text-gray-300 text-sm line-clamp-3 z-10">
-                            Membersihkan rumah 2 lantai pasca renovasi. Alat disediakan.
-                        </p>
-                    </div>
-                    <div class="bg-[#1a2526] px-6 py-4 border-t border-gray-700">
-                        <div class="flex items-center justify-between text-white text-sm mb-2">
-                            <span class="font-medium text-seafoam-bloom">Bayaran :</span>
-                            <span class="font-bold">Rp 300.000</span>
-                        </div>
-                        <div class="flex items-center justify-between text-white text-sm">
-                            <span class="text-gray-400">Durasi kerja: <span class="text-white">6 Jam</span></span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-gray-400">Bandung</span>
-                                <i class="fas fa-map-marker-alt text-pelagic-blue"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </main>
+
+    <script>
+        // Toggle Filter Sidebar
+        const filterToggle = document.getElementById('filterToggle');
+        const filterSidebar = document.getElementById('filterSidebar');
+        const filterOverlay = document.getElementById('filterOverlay');
+        const closeFilter = document.getElementById('closeFilter');
+
+        // Open filter
+        filterToggle.addEventListener('click', () => {
+            filterSidebar.classList.remove('-translate-x-full');
+            filterOverlay.classList.remove('hidden');
+        });
+
+        // Close filter
+        closeFilter.addEventListener('click', () => {
+            filterSidebar.classList.add('-translate-x-full');
+            filterOverlay.classList.add('hidden');
+        });
+
+        // Close when clicking overlay
+        filterOverlay.addEventListener('click', () => {
+            filterSidebar.classList.add('-translate-x-full');
+            filterOverlay.classList.add('hidden');
+        });
+    </script>
 
 </body>
 </html>

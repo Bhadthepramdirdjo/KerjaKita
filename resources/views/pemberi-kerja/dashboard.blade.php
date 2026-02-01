@@ -59,9 +59,9 @@
     <!-- Sidebar (Floating Style) -->
     <aside class="w-20 lg:w-24 h-screen flex flex-col items-center py-8 z-50 fixed left-0 top-0 bg-white border-r border-gray-200 shadow-sm">
         <div class="mb-auto">
-             <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
+             <a href="{{ route('pemberi-kerja.pengaturan') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-cog text-2xl"></i>
-            </button>
+            </a>
         </div>
         <div class="flex flex-col space-y-8">
             <button class="w-12 h-12 rounded-xl flex items-center justify-center bg-keel-black text-white shadow-lg transform scale-110">

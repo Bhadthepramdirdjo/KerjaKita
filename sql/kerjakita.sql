@@ -197,6 +197,7 @@ CREATE TABLE `lowongan` (
   `idPemberiKerja` int(11) NOT NULL,
   `judul` varchar(255) NOT NULL,
   `deskripsi` text NOT NULL,
+  `gambar` text DEFAULT NULL,
   `lokasi` varchar(255) NOT NULL,
   `upah` decimal(15,2) DEFAULT NULL,
   `status` varchar(50) DEFAULT 'aktif',

@@ -36,7 +36,36 @@ class PekerjaController extends Controller
      */
     public function detailLowongan($id)
     {
-        // Placeholder
-        return "Detail lowongan " . $id;
+        // Ambil data lowongan dengan join ke tabel terkait
+        $lowongan = DB::table('Lowongan')
+            ->join('PemberiKerja', 'Lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+            ->join('User', 'PemberiKerja.idUser', '=', 'User.idUser')
+            ->leftJoin('Lowongan_Kategori', 'Lowongan.idLowongan', '=', 'Lowongan_Kategori.idLowongan')
+            ->leftJoin('Kategori', 'Lowongan_Kategori.id_kategori', '=', 'Kategori.id_kategori')
+            ->where('Lowongan.idLowongan', $id)
+            ->select(
+                'Lowongan.*',
+                'PemberiKerja.nama_perusahaan',
+                'PemberiKerja.alamat as alamat_perusahaan',
+                'PemberiKerja.no_telp as telp_perusahaan',
+                'User.nama as nama_pemberi_kerja',
+                'Kategori.nama_kategori'
+            )
+            ->first();
+        
+        // Jika lowongan tidak ditemukan
+        if (!$lowongan) {
+            abort(404, 'Lowongan tidak ditemukan');
+        }
+        
+        return view('pekerja.lowongan.detail-pekerjaan', compact('lowongan'));
+    }
+    
+    /**
+     * Halaman Pengaturan
+     */
+    public function pengaturan()
+    {
+        return view('pekerja.pengaturan');
     }
 }

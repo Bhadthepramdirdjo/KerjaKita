@@ -61,4 +61,12 @@ class PemberiKerjaController extends Controller
 
         return view('pemberi-kerja.dashboard', compact('stats', 'pekerjaan'));
     }
+    
+    /**
+     * Halaman Pengaturan
+     */
+    public function pengaturan()
+    {
+        return view('pemberi-kerja.pengaturan');
+    }
 }
