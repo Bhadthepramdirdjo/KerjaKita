@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengaturan - KerjaKita</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/LOGO.png') }}">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -36,17 +36,17 @@
             }
         }
     </script>
-    
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #E8FBFF;
         }
-        
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
-        
+
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -63,25 +63,25 @@
                 <i class="fas fa-cog text-xl"></i>
             </button>
         </div>
-        
+
         <!-- Center Icons -->
         <div class="flex flex-col space-y-8">
             <a href="{{ route('pekerja.dashboard') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-home text-xl"></i>
             </a>
-            
+
             <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
         </div>
-        
+
         <!-- Bottom Placeholder -->
         <div class="mt-auto"></div>
     </aside>
 
     <!-- Main Content -->
     <main class="flex-1 ml-20 lg:ml-24 flex flex-col h-screen relative">
-        
+
         <!-- Header Section -->
         <header class="w-full px-6 py-6 flex items-center gap-4">
             <!-- Back Button -->
@@ -91,8 +91,8 @@
 
             <!-- Search Bar -->
             <div class="flex-1 relative">
-                <input type="text" 
-                       placeholder="Cari pengaturan..." 
+                <input type="text"
+                       placeholder="Cari pengaturan..."
                        class="w-full bg-white border-2 border-keel-black rounded-full py-2 px-6 focus:outline-none focus:ring-2 focus:ring-pelagic-blue shadow-sm">
                 <button class="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center">
                     <i class="fas fa-search text-keel-black"></i>
@@ -113,13 +113,13 @@
 
         <!-- Scrollable Content Area -->
         <div class="flex-1 overflow-y-auto no-scrollbar px-4 sm:px-8 pb-20">
-            
+
             <!-- Settings Container -->
             <div class="max-w-3xl mx-auto">
-                
+
                 <!-- Settings Card -->
                 <div class="bg-white rounded-3xl shadow-xl overflow-hidden border-2 border-gray-200">
-                    
+
                     <!-- Header -->
                     <div class="bg-gradient-to-r from-pelagic-blue to-abyss-teal p-6">
                         <h2 class="text-2xl font-bold text-white">PENGATURAN</h2>
@@ -127,7 +127,7 @@
 
                     <!-- Menu Items -->
                     <div class="divide-y divide-gray-200">
-                        
+
                         <!-- Akun -->
                         <a href="#" class="block p-6 hover:bg-seafoam-bloom hover:bg-opacity-10 transition-colors group">
                             <div class="flex items-center justify-between">
@@ -156,8 +156,8 @@
                                     <form class="space-y-4">
                                         <div>
                                             <label class="block text-sm font-semibold text-gray-700 mb-2">Pesan Anda</label>
-                                            <textarea 
-                                                rows="4" 
+                                            <textarea
+                                                rows="4"
                                                 placeholder="Tuliskan masukan atau saran Anda di sini..."
                                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pelagic-blue focus:border-transparent resize-none"></textarea>
                                         </div>
@@ -215,18 +215,18 @@
                 <div id="logoutModal" class="fixed inset-0 z-50 hidden items-center justify-center">
                     <!-- Backdrop Blur -->
                     <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"></div>
-                    
+
                     <!-- Modal Content -->
                     <div class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
                         <!-- Icon -->
                         <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-sign-out-alt text-3xl text-red-600"></i>
                         </div>
-                        
+
                         <!-- Title -->
                         <h3 class="text-2xl font-bold text-center text-keel-black mb-2">Konfirmasi Keluar</h3>
                         <p class="text-center text-gray-600 mb-6">Apakah Anda yakin ingin keluar dari akun Anda?</p>
-                        
+
                         <!-- Buttons -->
                         <div class="flex gap-3">
                             <button id="cancelLogout" class="flex-1 bg-gray-200 hover:bg-gray-300 text-keel-black font-bold py-3 px-6 rounded-full transition-colors">
@@ -327,10 +327,19 @@
 
         // Confirm logout (nanti akan redirect ke logout route)
         confirmLogout.addEventListener('click', () => {
-            // TODO: Implement logout functionality
-            alert('Logout berhasil! (Fungsi logout belum diimplementasi)');
-            logoutModal.classList.add('hidden');
-            logoutModal.classList.remove('flex');
+            // Create form untuk submit POST request
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ route('logout') }}";
+
+            const token = document.createElement('input');
+            token.type = 'hidden';
+            token.name = '_token';
+            token.value = "{{ csrf_token() }}";
+
+            form.appendChild(token);
+            document.body.appendChild(form);
+            form.submit();
         });
 
         // Close modal when clicking backdrop

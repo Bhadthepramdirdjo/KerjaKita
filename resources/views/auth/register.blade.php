@@ -232,21 +232,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input
-                        type="text"
-                        name="username"
-                        class="form-input"
-                        placeholder="Username"
-                        value="{{ old('username') }}"
-                        required
-                    >
-                    @error('username')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
                     <label class="form-label">Email</label>
                     <input
                         type="email"
@@ -262,20 +247,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Alamat Lengkap</label>
-                    <input
-                        type="text"
-                        name="alamat"
-                        class="form-input"
-                        placeholder="Alamat"
-                        value="{{ old('alamat') }}"
-                    >
-                    @error('alamat')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
                     <label class="form-label">Password</label>
                     <input
                         type="password"
@@ -285,6 +256,34 @@
                         required
                     >
                     @error('password')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Konfirmasi Password</label>
+                    <input
+                        type="password"
+                        name="password_confirmation"
+                        class="form-input"
+                        placeholder="Konfirmasi Password"
+                        required
+                    >
+                    @error('password_confirmation')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Alamat Lengkap</label>
+                    <input
+                        type="text"
+                        name="alamat"
+                        class="form-input"
+                        placeholder="Alamat"
+                        value="{{ old('alamat') }}"
+                    >
+                    @error('alamat')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
@@ -360,7 +359,7 @@
                 Daftar sekarang
             </button>
 
-            <a href="/semester5/rpl2/KerjaKita/public/" class="back-btn">
+            <a href="{{ url('/') }}" class="back-btn">
                 Kembali ke Dashboard
             </a>
         </form>

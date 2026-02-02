@@ -118,6 +118,28 @@
             transform: translateY(0);
         }
 
+        .back-btn {
+            width: 100%;
+            padding: 9px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 6px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
         .register-link {
             text-align: center;
             margin-top: 15px;
@@ -211,6 +233,10 @@
                 LOGIN
             </button>
         </form>
+
+        <a href="/" class="back-btn" style="display: inline-block; width: 100%; padding: 9px; background: #6b7280; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 6px; text-align: center; text-decoration: none;">
+            Kembali ke Dashboard
+        </a>
 
         <div class="register-link">
             Belum punya akun? <a href="{{ route('register') }}">daftar disini</a>
