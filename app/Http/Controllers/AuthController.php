@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -13,6 +15,11 @@ class AuthController extends Controller
      */
     public function showLoginForm()
     {
+        // Jika sudah login, redirect ke dashboard
+        if (Auth::check()) {
+            return $this->redirectToDashboard();
+        }
+        
         return view('auth.login');
     }
 
@@ -29,27 +36,40 @@ class AuthController extends Controller
             'password.required' => 'Password harus diisi'
         ]);
 
-        // Cek user di database
-        $user = DB::table('User')
-            ->where('username', $request->username)
-            ->first();
+        // Attempt login menggunakan Laravel Auth
+        $credentials = [
+            'username' => $request->username,
+            'password' => $request->password
+        ];
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return back()
-                ->withErrors(['username' => 'Username atau password salah'])
-                ->withInput();
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            $request->session()->regenerate();
+            
+            // Log activity
+            DB::table('activity_log')->insert([
+                'idUser' => Auth::id(),
+                'activity_type' => 'login',
+                'description' => 'User login ke sistem',
+                'ip_address' => $request->ip(),
+                'created_at' => now()
+            ]);
+            
+            return redirect()->intended($this->redirectPath())
+                ->with('success', 'Login berhasil! Selamat datang, ' . Auth::user()->nama);
         }
 
-        // Simpan user ke session
-        session([
-            'user_id' => $user->idUser,
-            'username' => $user->username,
-            'nama' => $user->nama,
-            'email' => $user->email,
-            'tipe' => $user->tipe_user
+        // Log failed login attempt
+        DB::table('activity_log')->insert([
+            'idUser' => null,
+            'activity_type' => 'login_failed',
+            'description' => 'Gagal login dengan username: ' . $request->username,
+            'ip_address' => $request->ip(),
+            'created_at' => now()
         ]);
 
-        return redirect('/')->with('success', 'Login berhasil!');
+        return back()
+            ->withErrors(['username' => 'Username atau password salah'])
+            ->withInput($request->only('username'));
     }
 
     /**
@@ -57,6 +77,11 @@ class AuthController extends Controller
      */
     public function showRegisterForm()
     {
+        // Jika sudah login, redirect ke dashboard
+        if (Auth::check()) {
+            return $this->redirectToDashboard();
+        }
+        
         return view('auth.register');
     }
 
@@ -71,56 +96,140 @@ class AuthController extends Controller
             'email' => 'required|email|max:255|unique:User,email',
             'password' => 'required|string|min:6|confirmed',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'tipe_user' => 'required|in:Pekerja,PemberiKerja'
+            'tipe_user' => 'required|in:Pekerja,PemberiKerja',
+            'alamat' => 'nullable|string|max:500',
+            'no_hp' => 'nullable|string|max:20',
         ], [
+            'nama.required' => 'Nama lengkap harus diisi',
+            'username.required' => 'Username harus diisi',
             'username.unique' => 'Username sudah terdaftar',
+            'email.required' => 'Email harus diisi',
+            'email.email' => 'Format email tidak valid',
             'email.unique' => 'Email sudah terdaftar',
+            'password.required' => 'Password harus diisi',
             'password.min' => 'Password minimal 6 karakter',
-            'password.confirmed' => 'Konfirmasi password tidak cocok'
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'jenis_kelamin.required' => 'Jenis kelamin harus dipilih',
+            'tipe_user.required' => 'Tipe user harus dipilih',
         ]);
 
-        // Insert ke database
-        $userId = DB::table('User')->insertGetId([
-            'nama' => $request->nama,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'tipe_user' => $request->tipe_user,
-            'alamat' => $request->alamat ?? '',
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        try {
+            DB::beginTransaction();
 
-        // Jika pemberi kerja, buat record di tabel PemberiKerja
-        if ($request->tipe_user === 'PemberiKerja') {
-            DB::table('PemberiKerja')->insert([
-                'idUser' => $userId,
-                'nama_perusahaan' => $request->nama,
-                'created_at' => now(),
-                'updated_at' => now()
+            // Buat user baru menggunakan Model (akan trigger auto-create di database)
+            $user = User::create([
+                'nama' => $request->nama,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'tipe_user' => $request->tipe_user,
+                'alamat' => $request->alamat ?? '',
+                'no_hp' => $request->no_hp ?? '',
             ]);
-        }
 
-        // Jika pekerja, buat record di tabel Pekerja
-        if ($request->tipe_user === 'Pekerja') {
-            DB::table('Pekerja')->insert([
-                'idUser' => $userId,
-                'created_at' => now(),
-                'updated_at' => now()
+            // CATATAN: Trigger database akan otomatis membuat record di tabel PemberiKerja atau Pekerja
+            // Tapi kita tambahkan fallback jika trigger gagal
+            
+            if ($request->tipe_user === 'PemberiKerja') {
+                // Cek apakah sudah dibuat oleh trigger
+                $exists = DB::table('PemberiKerja')->where('idUser', $user->idUser)->exists();
+                if (!$exists) {
+                    DB::table('PemberiKerja')->insert([
+                        'idUser' => $user->idUser,
+                        'nama_perusahaan' => $request->nama, // Default pakai nama user
+                        'alamat' => $request->alamat ?? '',
+                        'no_telp' => $request->no_hp ?? '',
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+            } elseif ($request->tipe_user === 'Pekerja') {
+                // Cek apakah sudah dibuat oleh trigger
+                $exists = DB::table('Pekerja')->where('idUser', $user->idUser)->exists();
+                if (!$exists) {
+                    DB::table('Pekerja')->insert([
+                        'idUser' => $user->idUser,
+                        'alamat' => $request->alamat ?? '',
+                        'no_telp' => $request->no_hp ?? '',
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+            }
+
+            // Log activity
+            DB::table('activity_log')->insert([
+                'idUser' => $user->idUser,
+                'activity_type' => 'register',
+                'description' => 'User baru mendaftar sebagai ' . $request->tipe_user,
+                'ip_address' => $request->ip(),
+                'created_at' => now()
             ]);
-        }
 
-        return redirect()->route('login')
-            ->with('success', 'Pendaftaran berhasil! Silakan login dengan akun Anda.');
+            DB::commit();
+
+            return redirect()->route('login')
+                ->with('success', 'Pendaftaran berhasil! Silakan login dengan akun Anda.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // Log error
+            \Log::error('Registration failed: ' . $e->getMessage());
+            
+            return back()
+                ->withErrors(['error' => 'Terjadi kesalahan saat mendaftar: ' . $e->getMessage()])
+                ->withInput();
+        }
     }
 
     /**
      * Logout
      */
-    public function logout()
+    public function logout(Request $request)
     {
-        session()->forget(['user_id', 'username', 'nama', 'email', 'tipe']);
-        return redirect('/')->with('success', 'Logout berhasil');
+        // Log activity sebelum logout
+        if (Auth::check()) {
+            DB::table('activity_log')->insert([
+                'idUser' => Auth::id(),
+                'activity_type' => 'logout',
+                'description' => 'User logout dari sistem',
+                'ip_address' => $request->ip(),
+                'created_at' => now()
+            ]);
+        }
+
+        Auth::logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect()->route('home')
+            ->with('success', 'Logout berhasil');
+    }
+
+    /**
+     * Helper: Redirect path setelah login
+     */
+    protected function redirectPath()
+    {
+        if (Auth::user()->isPemberiKerja()) {
+            return route('pemberi-kerja.dashboard');
+        }
+        
+        return route('pekerja.dashboard');
+    }
+
+    /**
+     * Helper: Redirect ke dashboard sesuai role
+     */
+    protected function redirectToDashboard()
+    {
+        if (Auth::user()->isPemberiKerja()) {
+            return redirect()->route('pemberi-kerja.dashboard');
+        }
+        
+        return redirect()->route('pekerja.dashboard');
     }
 }

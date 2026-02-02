@@ -2,31 +2,41 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Nama tabel di database
+     */
+    protected $table = 'User';
+
+    /**
+     * Primary key
+     */
+    protected $primaryKey = 'idUser';
+
+    /**
+     * Kolom yang bisa diisi mass assignment
      */
     protected $fillable = [
-        'name',
+        'nama',
+        'username',
         'email',
         'password',
+        'jenis_kelamin',
+        'tipe_user',
+        'alamat',
+        'no_hp',
+        'foto_profil',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Kolom yang disembunyikan saat serialisasi
      */
     protected $hidden = [
         'password',
@@ -34,9 +44,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Kolom yang di-cast ke tipe tertentu
      */
     protected function casts(): array
     {
@@ -44,5 +52,37 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relasi ke tabel Pekerja
+     */
+    public function pekerja()
+    {
+        return $this->hasOne(\App\Models\Pekerja::class, 'idUser', 'idUser');
+    }
+
+    /**
+     * Relasi ke tabel PemberiKerja
+     */
+    public function pemberiKerja()
+    {
+        return $this->hasOne(\App\Models\PemberiKerja::class, 'idUser', 'idUser');
+    }
+
+    /**
+     * Helper method untuk cek apakah user adalah pekerja
+     */
+    public function isPekerja()
+    {
+        return $this->tipe_user === 'Pekerja';
+    }
+
+    /**
+     * Helper method untuk cek apakah user adalah pemberi kerja
+     */
+    public function isPemberiKerja()
+    {
+        return $this->tipe_user === 'PemberiKerja';
     }
 }

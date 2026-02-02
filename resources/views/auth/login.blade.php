@@ -94,6 +94,27 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
         }
 
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .remember-me label {
+            color: #374151;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 0;
+        }
+
         .login-btn {
             width: 100%;
             padding: 12px;
@@ -116,6 +137,28 @@
 
         .login-btn:active {
             transform: translateY(0);
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 9px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 6px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
         }
 
         .register-link {
@@ -151,6 +194,18 @@
             margin-bottom: 16px;
             font-size: 13px;
         }
+
+        .alert-box {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 12px;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
     </style>
 </head>
 <body>
@@ -162,7 +217,7 @@
         </div>
 
         @if ($errors->any())
-            <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 12px;">
+            <div class="alert-box alert-error">
                 @foreach ($errors->all() as $error)
                     <div>{{ $error }}</div>
                 @endforeach
@@ -187,6 +242,7 @@
                     placeholder="Masukkan username"
                     value="{{ old('username') }}"
                     required
+                    autofocus
                 >
                 @error('username')
                     <span class="error-message">{{ $message }}</span>
@@ -207,9 +263,22 @@
                 @enderror
             </div>
 
+            <div class="remember-me">
+                <input
+                    type="checkbox"
+                    id="remember"
+                    name="remember"
+                >
+                <label for="remember">Ingat Saya</label>
+            </div>
+
             <button type="submit" class="login-btn">
                 LOGIN
             </button>
+
+            <a href="{{ route('home') }}" class="back-btn">
+                Kembali ke Dashboard
+            </a>
         </form>
 
         <div class="register-link">

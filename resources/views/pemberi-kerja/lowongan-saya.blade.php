@@ -135,40 +135,6 @@
             <!-- Lowongan Cards -->
             <div class="max-w-6xl mx-auto space-y-4" id="lowonganContainer">
                 
-                @php
-                    // Dummy data lowongan untuk UI
-                    $lowongan = [
-                        (object)[
-                            'nama' => 'Tukang Bangunan',
-                            'lokasi' => 'Jl. Merdeka No. 45, Jakarta',
-                            'kategori' => 'Konstruksi',
-                            'pelamar' => 3,
-                            'status' => 'aktif'
-                        ],
-                        (object)[
-                            'nama' => 'Fish It',
-                            'lokasi' => 'Jl. Sudirman No. 12, Bandung',
-                            'kategori' => 'Nelayan Handal',
-                            'pelamar' => 2,
-                            'status' => 'aktif'
-                        ],
-                        (object)[
-                            'nama' => 'Cukur rambut prabowo',
-                            'lokasi' => 'Istana Negara',
-                            'kategori' => 'Kebutuhan personal',
-                            'pelamar' => 7,
-                            'status' => 'aktif'
-                        ],
-                        (object)[
-                            'nama' => 'Desainer Grafis',
-                            'lokasi' => 'Remote',
-                            'kategori' => 'Digital',
-                            'pelamar' => 0,
-                            'status' => 'draft'
-                        ],
-                    ];
-                @endphp
-
                 @foreach($lowongan as $job)
                 <!-- Lowongan Card -->
                 <div class="lowongan-card bg-white rounded-3xl shadow-lg overflow-hidden border-2 border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" data-status="{{ $job->status }}">
@@ -176,17 +142,12 @@
                         <div class="flex items-start justify-between mb-4">
                             <!-- Job Info -->
                             <div class="flex-1">
-                                <h3 class="text-xl font-bold text-keel-black mb-2">{{ $job->nama }}</h3>
+                                <h3 class="text-xl font-bold text-keel-black mb-2">{{ $job->judul }}</h3>
                                 
                                 <div class="space-y-1 text-sm text-gray-600">
                                     <div class="flex items-center gap-2">
                                         <i class="fas fa-map-marker-alt text-pelagic-blue w-4"></i>
                                         <span>{{ $job->lokasi }}</span>
-                                    </div>
-                                    
-                                    <div class="flex items-center gap-2">
-                                        <i class="fas fa-tag text-pelagic-blue w-4"></i>
-                                        <span>{{ $job->kategori }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -207,34 +168,34 @@
                         <div class="flex items-center justify-between pt-4 border-t border-gray-200">
                             <div class="flex items-center gap-2">
                                 <div class="flex -space-x-2">
-                                    @for($i = 0; $i < min($job->pelamar, 5); $i++)
+                                    @for($i = 0; $i < min($job->total_pelamar, 5); $i++)
                                     <div class="w-8 h-8 rounded-full bg-gray-300 border-2 border-white flex items-center justify-center">
                                         <i class="fas fa-user text-xs text-gray-600"></i>
                                     </div>
                                     @endfor
                                     
-                                    @if($job->pelamar > 5)
+                                    @if($job->total_pelamar > 5)
                                     <div class="w-8 h-8 rounded-full bg-pelagic-blue border-2 border-white flex items-center justify-center">
-                                        <span class="text-xs text-white font-bold">+{{ $job->pelamar - 5 }}</span>
+                                        <span class="text-xs text-white font-bold">+{{ $job->total_pelamar - 5 }}</span>
                                     </div>
                                     @endif
                                 </div>
                                 
                                 <span class="text-sm text-gray-600 font-semibold">
-                                    {{ $job->pelamar }} Pelamar
+                                    {{ $job->total_pelamar }} Pelamar
                                 </span>
                             </div>
 
                             <!-- Action Buttons -->
                             <div class="flex gap-2">
-                                <button class="px-4 py-2 bg-pelagic-blue hover:bg-abyss-teal text-white font-semibold rounded-full transition-colors text-sm">
+                                <a href="{{ route('pemberi-kerja.lowongan.pelamar', $job->idLowongan) }}" class="px-4 py-2 bg-pelagic-blue hover:bg-abyss-teal text-white font-semibold rounded-full transition-colors text-sm">
                                     <i class="fas fa-eye mr-1"></i>
                                     Lihat
-                                </button>
-                                <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-keel-black font-semibold rounded-full transition-colors text-sm">
+                                </a>
+                                <a href="{{ route('pemberi-kerja.lowongan.edit', $job->idLowongan) }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-keel-black font-semibold rounded-full transition-colors text-sm">
                                     <i class="fas fa-edit mr-1"></i>
                                     Edit
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>

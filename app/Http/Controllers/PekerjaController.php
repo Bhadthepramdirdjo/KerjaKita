@@ -16,11 +16,22 @@ class PekerjaController extends Controller
         // Kita join dengan tabel lain untuk mendapatkan nama perusahaan/lokasi jika perlu
         // Sesuai wireframe, kita butuh: Judul, Deskripsi, Upah, Lokasi
         
-        $lowongan = DB::table('Lowongan')
+        $lowongan = DB::table('lowongan')
             ->where('status', 'aktif')
             ->get();
 
-        return view('pekerja.dashboard', compact('lowongan'));
+        // Ambil notifikasi untuk pekerja yang sedang login
+        $idUser = auth()->user()->idUser ?? null;
+        $notifikasi = [];
+        if ($idUser) {
+            $notifikasi = DB::table('notifikasi')
+                ->where('idUser', $idUser)
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
+        }
+
+        return view('pekerja.dashboard', compact('lowongan', 'notifikasi'));
     }
 
     /**
