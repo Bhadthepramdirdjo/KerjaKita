@@ -599,8 +599,8 @@
                 <!-- About -->
                 <div>
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-briefcase text-white"></i>
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center p-1.5">
+                            <img src="{{ asset('images/LOGO.png') }}" alt="KerjaKita Logo" class="w-full h-full object-contain">
                         </div>
                         <span class="text-xl font-bold font-poppins">KerjaKita</span>
                     </div>
