@@ -57,6 +57,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/buat-lowongan', [App\Http\Controllers\PemberiKerjaController::class, 'buatLowongan'])->name('buat-lowongan');
         Route::post('/simpan-lowongan', [App\Http\Controllers\PemberiKerjaController::class, 'simpanLowongan'])->name('simpan-lowongan');
         Route::get('/rekomendasi-pekerja', [App\Http\Controllers\PemberiKerjaController::class, 'rekomendasiPekerja'])->name('rekomendasi-pekerja');
+        Route::get('/lowongan-saya', [App\Http\Controllers\PemberiKerjaController::class, 'lowonganSaya'])->name('lowongan-saya');
         Route::get('/pengaturan', [App\Http\Controllers\PemberiKerjaController::class, 'pengaturan'])->name('pengaturan');
     });
 // });

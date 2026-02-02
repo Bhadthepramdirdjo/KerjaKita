@@ -70,9 +70,9 @@
             <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
-            <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
+            <a href="{{ route('pemberi-kerja.lowongan-saya') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-briefcase text-2xl"></i>
-            </button>
+            </a>
         </div>
         <div class="mt-auto"></div>
     </aside>

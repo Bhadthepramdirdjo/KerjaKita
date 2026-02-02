@@ -95,4 +95,12 @@ class PemberiKerjaController extends Controller
     {
         return view('pemberi-kerja.rekomendasi-pekerja');
     }
+    
+    /**
+     * Halaman Lowongan Saya
+     */
+    public function lowonganSaya()
+    {
+        return view('pemberi-kerja.lowongan-saya');
+    }
 }

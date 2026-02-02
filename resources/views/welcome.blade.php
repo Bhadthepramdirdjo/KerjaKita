@@ -257,10 +257,10 @@
                     
                     <!-- CTA Buttons -->
                     <div class="flex flex-col sm:flex-row gap-4 mb-10">
-                        <a href="{{ route('register') }}?role=pekerja" class="bg-white text-blue-600 px-6 md:px-8 py-3 md:py-4 rounded-full font-bold hover:bg-gray-100 transition-all shadow-xl shine btn-ripple text-center">
+                        <a href="{{ route('pekerja.dashboard') }}" class="bg-white text-blue-600 px-6 md:px-8 py-3 md:py-4 rounded-full font-bold hover:bg-gray-100 transition-all shadow-xl shine btn-ripple text-center">
                             <i class="fas fa-user-tie mr-2"></i> Saya Cari Kerja
                         </a>
-                        <a href="{{ route('register') }}?role=pemberi" class="bg-yellow-400 text-gray-900 px-6 md:px-8 py-3 md:py-4 rounded-full font-bold hover:bg-yellow-500 transition-all shadow-xl shine btn-ripple text-center">
+                        <a href="{{ route('pemberi-kerja.dashboard') }}" class="bg-yellow-400 text-gray-900 px-6 md:px-8 py-3 md:py-4 rounded-full font-bold hover:bg-yellow-500 transition-all shadow-xl shine btn-ripple text-center">
                             <i class="fas fa-briefcase mr-2"></i> Saya Cari Pekerja
                         </a>
                     </div>

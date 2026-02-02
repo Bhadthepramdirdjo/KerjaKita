@@ -315,18 +315,16 @@
                         <!-- Action Buttons -->
                         <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 space-y-3">
                             <button 
-                                type="submit" 
-                                name="action" 
-                                value="publish"
+                                type="button"
+                                id="publikasiBtn"
                                 class="w-full bg-pelagic-blue hover:bg-abyss-teal text-white font-bold py-4 px-6 rounded-full transition-colors shadow-lg">
                                 <i class="fas fa-paper-plane mr-2"></i>
                                 Publikasikan
                             </button>
                             
                             <button 
-                                type="submit" 
-                                name="action" 
-                                value="draft"
+                                type="button"
+                                id="draftBtn"
                                 class="w-full bg-gray-200 hover:bg-gray-300 text-keel-black font-bold py-4 px-6 rounded-full transition-colors">
                                 <i class="fas fa-save mr-2"></i>
                                 Simpan Draft
@@ -346,6 +344,86 @@
 
         </div>
     </main>
+
+    <!-- Modal Konfirmasi -->
+    <div id="konfirmasiModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <!-- Backdrop Blur -->
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+            <!-- Icon -->
+            <div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-3xl text-yellow-600"></i>
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-2xl font-bold text-center text-keel-black mb-2">Konfirmasi Lowongan</h3>
+            <p class="text-center text-gray-600 mb-4">
+                Pastikan semua informasi yang Anda masukkan sudah benar:
+            </p>
+            
+            <!-- Checklist -->
+            <div class="bg-foam-white rounded-2xl p-4 mb-6 space-y-2 text-sm">
+                <div class="flex items-start gap-2">
+                    <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                    <span class="text-gray-700">Judul pekerjaan sudah sesuai</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                    <span class="text-gray-700">Upah yang ditawarkan sudah benar</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                    <span class="text-gray-700">Deskripsi pekerjaan sudah lengkap</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                    <span class="text-gray-700">Nomor kontak dapat dihubungi</span>
+                </div>
+            </div>
+            
+            <p class="text-center text-sm text-pelagic-blue font-semibold mb-6">
+                <span id="modalActionText">Publikasikan</span> lowongan ini sekarang?
+            </p>
+            
+            <!-- Buttons -->
+            <div class="flex gap-3">
+                <button id="cancelKonfirmasi" class="flex-1 bg-gray-200 hover:bg-gray-300 text-keel-black font-bold py-3 px-6 rounded-full transition-colors">
+                    Batal
+                </button>
+                <button id="confirmAction" class="flex-1 bg-pelagic-blue hover:bg-abyss-teal text-white font-bold py-3 px-6 rounded-full transition-colors shadow-lg">
+                    Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sukses -->
+    <div id="suksesModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <!-- Backdrop Blur -->
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+            <!-- Icon Success -->
+            <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-4xl text-green-600"></i>
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-2xl font-bold text-center text-keel-black mb-2" id="suksesTitle">Pekerjaan berhasil di publikasi</h3>
+            <p class="text-center text-gray-600 mb-6" id="suksesMessage">
+                Terimakasih sudah menyediakan Lapangan Kerja seperti yang dijanjikan oleh <span class="font-bold text-pelagic-blue">presiden Prabowo</span>.<br><br>
+                Jangan lupa berikan upah kepada pekerja
+            </p>
+            
+            <!-- Button -->
+            <button id="okeSukses" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-full transition-colors shadow-lg">
+                OKE
+            </button>
+        </div>
+    </div>
 
     <script>
         // Format Rupiah Input
@@ -430,6 +508,97 @@
                 displayPreviews();
             }
         }
+
+        // Modal Logic
+        const publikasiBtn = document.getElementById('publikasiBtn');
+        const draftBtn = document.getElementById('draftBtn');
+        const konfirmasiModal = document.getElementById('konfirmasiModal');
+        const suksesModal = document.getElementById('suksesModal');
+        const cancelKonfirmasi = document.getElementById('cancelKonfirmasi');
+        const confirmAction = document.getElementById('confirmAction');
+        const okeSukses = document.getElementById('okeSukses');
+        const modalActionText = document.getElementById('modalActionText');
+        const suksesTitle = document.getElementById('suksesTitle');
+        const suksesMessage = document.getElementById('suksesMessage');
+
+        let currentAction = '';
+
+        // Publikasi button
+        publikasiBtn.addEventListener('click', () => {
+            currentAction = 'publish';
+            modalActionText.textContent = 'Publikasikan';
+            konfirmasiModal.classList.remove('hidden');
+            konfirmasiModal.classList.add('flex');
+        });
+
+        // Draft button - langsung ke modal sukses tanpa konfirmasi
+        draftBtn.addEventListener('click', () => {
+            currentAction = 'draft';
+            
+            // Update sukses modal content untuk draft
+            suksesTitle.textContent = 'Draft berhasil disimpan';
+            suksesMessage.innerHTML = 'Lowongan pekerjaan Anda telah disimpan sebagai draft.<br><br>Anda dapat melanjutkan atau mempublikasikannya nanti.';
+            
+            // Langsung show sukses modal
+            suksesModal.classList.remove('hidden');
+            suksesModal.classList.add('flex');
+            
+            // TODO: Submit form ke backend
+            // document.querySelector('form').submit();
+        });
+
+        // Cancel konfirmasi
+        cancelKonfirmasi.addEventListener('click', () => {
+            konfirmasiModal.classList.add('hidden');
+            konfirmasiModal.classList.remove('flex');
+        });
+
+        // Confirm action
+        confirmAction.addEventListener('click', () => {
+            // Close konfirmasi modal
+            konfirmasiModal.classList.add('hidden');
+            konfirmasiModal.classList.remove('flex');
+
+            // Update sukses modal content
+            if (currentAction === 'publish') {
+                suksesTitle.textContent = 'Pekerjaan berhasil di publikasi';
+                suksesMessage.innerHTML = 'Terimakasih sudah menyediakan Lapangan Kerja seperti yang dijanjikan oleh <span class="font-bold text-pelagic-blue">presiden Prabowo</span>.<br><br>Jangan lupa berikan upah kepada pekerja';
+            } else {
+                suksesTitle.textContent = 'Draft berhasil disimpan';
+                suksesMessage.innerHTML = 'Lowongan pekerjaan Anda telah disimpan sebagai draft.<br><br>Anda dapat melanjutkan atau mempublikasikannya nanti.';
+            }
+
+            // Show sukses modal
+            suksesModal.classList.remove('hidden');
+            suksesModal.classList.add('flex');
+
+            // TODO: Submit form ke backend
+            // document.querySelector('form').submit();
+        });
+
+        // OKE button on sukses modal
+        okeSukses.addEventListener('click', () => {
+            suksesModal.classList.add('hidden');
+            suksesModal.classList.remove('flex');
+            
+            // Redirect to dashboard
+            window.location.href = "{{ route('pemberi-kerja.dashboard') }}";
+        });
+
+        // Close modal when clicking backdrop
+        konfirmasiModal.addEventListener('click', (e) => {
+            if (e.target === konfirmasiModal) {
+                konfirmasiModal.classList.add('hidden');
+                konfirmasiModal.classList.remove('flex');
+            }
+        });
+
+        suksesModal.addEventListener('click', (e) => {
+            if (e.target === suksesModal) {
+                suksesModal.classList.add('hidden');
+                suksesModal.classList.remove('flex');
+            }
+        });
     </script>
 
 </body>

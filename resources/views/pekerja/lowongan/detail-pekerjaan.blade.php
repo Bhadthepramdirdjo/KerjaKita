@@ -257,7 +257,7 @@
                             </div>
 
                             <!-- Apply Button -->
-                            <button class="w-full bg-seafoam-bloom hover:bg-shallow-reef text-keel-black font-bold py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                            <button id="lamarBtn" class="w-full bg-seafoam-bloom hover:bg-shallow-reef text-keel-black font-bold py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2">
                                 <i class="fas fa-paper-plane"></i>
                                 <span>Lamar Sekarang</span>
                             </button>
@@ -278,6 +278,92 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal Konfirmasi Lamaran -->
+    <div id="lamaranModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <!-- Backdrop Blur -->
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+            <!-- Icon -->
+            <div class="w-16 h-16 rounded-full bg-pelagic-blue bg-opacity-20 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-briefcase text-3xl text-pelagic-blue"></i>
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-2xl font-bold text-center text-keel-black mb-2">Konfirmasi Lamaran</h3>
+            <p class="text-center text-gray-600 mb-6">
+                Apakah Anda yakin ingin melamar pekerjaan ini? 
+                <br><br>
+                <span class="text-sm font-semibold text-pelagic-blue">
+                    Dengan melamar, Anda berkomitmen untuk bertanggung jawab dan menyelesaikan pekerjaan dengan baik sesuai kesepakatan.
+                </span>
+            </p>
+            
+            <!-- Job Info Summary -->
+            <div class="bg-foam-white rounded-2xl p-4 mb-6">
+                <div class="flex items-center gap-3 mb-2">
+                    <i class="fas fa-briefcase text-pelagic-blue"></i>
+                    <span class="font-bold text-keel-black">{{ $lowongan->judul }}</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-gray-600">
+                    <i class="fas fa-money-bill-wave text-green-600"></i>
+                    <span>Rp {{ number_format($lowongan->upah, 0, ',', '.') }}</span>
+                </div>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex gap-3">
+                <button id="cancelLamar" class="flex-1 bg-gray-200 hover:bg-gray-300 text-keel-black font-bold py-3 px-6 rounded-full transition-colors">
+                    Batal
+                </button>
+                <button id="confirmLamar" class="flex-1 bg-pelagic-blue hover:bg-abyss-teal text-white font-bold py-3 px-6 rounded-full transition-colors shadow-lg">
+                    Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal Lamaran
+        const lamarBtn = document.getElementById('lamarBtn');
+        const lamaranModal = document.getElementById('lamaranModal');
+        const cancelLamar = document.getElementById('cancelLamar');
+        const confirmLamar = document.getElementById('confirmLamar');
+
+        // Open modal
+        lamarBtn.addEventListener('click', () => {
+            lamaranModal.classList.remove('hidden');
+            lamaranModal.classList.add('flex');
+        });
+
+        // Close modal
+        cancelLamar.addEventListener('click', () => {
+            lamaranModal.classList.add('hidden');
+            lamaranModal.classList.remove('flex');
+        });
+
+        // Confirm lamaran (nanti akan submit form atau AJAX)
+        confirmLamar.addEventListener('click', () => {
+            // TODO: Implement submit lamaran
+            // Untuk sementara, tampilkan alert
+            alert('Lamaran berhasil dikirim! (Fungsi submit belum diimplementasi)');
+            lamaranModal.classList.add('hidden');
+            lamaranModal.classList.remove('flex');
+            
+            // Nanti bisa redirect atau refresh
+            // window.location.href = "{{ route('pekerja.dashboard') }}";
+        });
+
+        // Close modal when clicking backdrop
+        lamaranModal.addEventListener('click', (e) => {
+            if (e.target === lamaranModal) {
+                lamaranModal.classList.add('hidden');
+                lamaranModal.classList.remove('flex');
+            }
+        });
+    </script>
 
 </body>
 </html>
