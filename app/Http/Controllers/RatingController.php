@@ -17,7 +17,13 @@ class RatingController extends Controller
         $validated = $request->validate([
             'idPekerjaan' => 'required|integer',
             'nilai_rating' => 'required|integer|min:1|max:5',
-            'ulasan' => 'nullable|string|max:500'
+            'ulasan' => 'nullable|string|max:500',
+            // Input tambahan detail
+            'kualitas' => 'nullable|integer|min:1|max:5',
+            'waktu' => 'nullable|integer|min:1|max:5',
+            'komunikasi' => 'nullable|integer|min:1|max:5',
+            'inisiatif' => 'nullable|integer|min:1|max:5',
+            'bersedia_kembali' => 'nullable|string'
         ]);
 
         try {
@@ -45,28 +51,47 @@ class RatingController extends Controller
                 return redirect()->back()->with('error', 'Pekerjaan harus diselesaikan terlebih dahulu sebelum memberi rating');
             }
 
-            // 3. Cek apakah sudah pernah memberi rating
+            // 3. Cek apakah sudah pernah memberi rating sebagai PemberiKerja
             $existingRating = DB::table('rating')
                 ->where('idPekerjaan', $validated['idPekerjaan'])
+                ->where('pemberi_rating', 'PemberiKerja')
                 ->first();
 
             if ($existingRating) {
                 return redirect()->back()->with('error', 'Rating untuk pekerjaan ini sudah diberikan');
             }
 
+            // Gabungkan detail penilaian ke ulasan text
+            $richUlasan = $validated['ulasan'] ?? '';
+            // Append detail jika ada (seperti mockup)
+            if ($request->has('kualitas')) {
+                $detailStr = [];
+                if($request->kualitas) $detailStr[] = "Kualitas: {$request->kualitas}/5";
+                if($request->waktu) $detailStr[] = "Waktu: {$request->waktu}/5";
+                if($request->komunikasi) $detailStr[] = "Komunikasi: {$request->komunikasi}/5";
+                if($request->inisiatif) $detailStr[] = "Inisiatif: {$request->inisiatif}/5";
+                
+                if (!empty($detailStr)) {
+                    $richUlasan .= "\n\n[Detail Penilaian]\n" . implode("\n", $detailStr);
+                }
+            }
+            if ($request->has('bersedia_kembali')) {
+                $richUlasan .= "\n\nBersedia bekerja lagi: " . $request->bersedia_kembali;
+            }
+
             // 4. Simpan rating
             $ratingId = DB::table('rating')->insertGetId([
                 'idPekerjaan' => $validated['idPekerjaan'],
                 'nilai_rating' => $validated['nilai_rating'],
-                'ulasan' => $validated['ulasan'] ?? null,
-                'pemberi_rating' => 'pemberi_kerja',
+                'ulasan' => $richUlasan, // Simpan ulasan lengkap
+                'pemberi_rating' => 'PemberiKerja', // Case sensitive match controller lain
                 'created_at' => now()
             ]);
 
-            // 5. Update status pekerjaan menjadi selesai dengan rating
+            // 5. Update status pekerjaan (tidak wajib karena sudah selesai, tapi untuk log updated_at)
             DB::table('pekerjaan')
                 ->where('idPekerjaan', $validated['idPekerjaan'])
-                ->update(['status_pekerjaan' => 'selesai']);
+                ->update(['updated_at' => now()]);
 
             // 6. Buat notifikasi untuk pekerja
             $pekerja = DB::table('pekerja')->where('idPekerja', $pekerjaan->idPekerja)->first();
@@ -74,7 +99,7 @@ class RatingController extends Controller
             DB::table('notifikasi')->insert([
                 'idUser' => $pekerja->idUser,
                 'tipe_notifikasi' => 'rating',
-                'pesan' => "Anda menerima rating {$validated['nilai_rating']} bintang dari pemberi kerja untuk pekerjaan '{$pekerjaan->judul}'",
+                'pesan' => "Anda menerima rating <strong>{$validated['nilai_rating']} bintang</strong> dari pemberi kerja untuk pekerjaan '<strong>{$pekerjaan->judul}</strong>'.",
                 'is_read' => 0,
                 'created_at' => now()
             ]);

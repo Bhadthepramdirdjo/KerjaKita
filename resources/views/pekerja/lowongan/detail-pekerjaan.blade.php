@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Detail Pekerjaan - KerjaKita</title>
     
     <!-- Favicon -->
@@ -85,7 +86,7 @@
         <!-- Header Section -->
         <header class="w-full px-6 py-6 flex items-center gap-4">
             <!-- Back Button -->
-            <a href="{{ route('pekerja.dashboard') }}" class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100 flex-shrink-0">
+            <a href="javascript:history.back()" class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100 flex-shrink-0">
                 <i class="fas fa-arrow-left text-keel-black"></i>
             </a>
 
@@ -344,16 +345,57 @@
             lamaranModal.classList.remove('flex');
         });
 
-        // Confirm lamaran (nanti akan submit form atau AJAX)
-        confirmLamar.addEventListener('click', () => {
-            // TODO: Implement submit lamaran
-            // Untuk sementara, tampilkan alert
-            alert('Lamaran berhasil dikirim! (Fungsi submit belum diimplementasi)');
+        // Confirm lamaran - Submit ke backend
+        confirmLamar.addEventListener('click', async () => {
+            // Disable button dan tampilkan loading
+            confirmLamar.disabled = true;
+            confirmLamar.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
+            
+            try {
+                // Get CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                
+                // Submit lamaran via AJAX
+                const response = await fetch("{{ route('pekerja.lowongan.lamar', $lowongan->idLowongan) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || '',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        idLowongan: {{ $lowongan->idLowongan }}
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Sukses - Tampilkan pesan dan redirect
+                    alert('✅ Lamaran berhasil dikirim!\n\nLamaran Anda akan segera diproses oleh pemberi kerja.');
+                    
+                    // Redirect ke halaman lamaran
+                    window.location.href = "{{ route('pekerja.lamaran') }}";
+                } else {
+                    // Error dari server
+                    alert('❌ ' + (data.message || 'Gagal mengirim lamaran. Silakan coba lagi.'));
+                    
+                    // Reset button
+                    confirmLamar.disabled = false;
+                    confirmLamar.innerHTML = 'Lanjutkan';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Terjadi kesalahan. Silakan coba lagi.');
+                
+                // Reset button
+                confirmLamar.disabled = false;
+                confirmLamar.innerHTML = 'Lanjutkan';
+            }
+            
+            // Close modal
             lamaranModal.classList.add('hidden');
             lamaranModal.classList.remove('flex');
-            
-            // Nanti bisa redirect atau refresh
-            // window.location.href = "{{ route('pekerja.dashboard') }}";
         });
 
         // Close modal when clicking backdrop

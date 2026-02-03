@@ -16,31 +16,8 @@ class PekerjaanController extends Controller
         try {
             DB::beginTransaction();
 
-            // 1. Ambil data pekerjaan
-            $pekerjaan = DB::table('pekerjaan')
-                ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
-                ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-                ->join('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
-                ->select(
-                    'pekerjaan.*',
-                    'lamaran.idPekerja',
-                    'lowongan.idPemberiKerja',
-                    'lowongan.judul as judul_lowongan',
-                    'pekerja.idUser as idUserPekerja'
-                )
-                ->where('pekerjaan.idPekerjaan', $id)
-                ->first();
-
-            if (!$pekerjaan) {
-                return redirect()->back()->with('error', 'Pekerjaan tidak ditemukan');
-            }
-
-            if ($pekerjaan->status_pekerjaan === 'selesai') {
-                return redirect()->back()->with('error', 'Pekerjaan sudah diselesaikan sebelumnya');
-            }
-
-            // 2. Update status pekerjaan menjadi 'selesai'
-            DB::table('pekerjaan')
+            // 1. Langsung update status menjadi 'selesai'
+            $affected = DB::table('pekerjaan')
                 ->where('idPekerjaan', $id)
                 ->update([
                     'status_pekerjaan' => 'selesai',
@@ -48,19 +25,45 @@ class PekerjaanController extends Controller
                     'updated_at' => now()
                 ]);
 
+            if ($affected === 0) {
+                // Cek apakah ID ada tapi status sudah selesai, atau ID memang tidak ada
+                $check = DB::table('pekerjaan')->where('idPekerjaan', $id)->first();
+                if (!$check) {
+                    return redirect()->back()->with('error', 'Pekerjaan tidak ditemukan (ID: ' . $id . ')');
+                }
+                if ($check->status_pekerjaan === 'selesai') {
+                     return redirect()->back()->with('success', 'Pekerjaan sudah berstatus selesai.');
+                }
+                // Fallback catch all
+                return redirect()->back()->with('error', 'Gagal mengupdate status pekerjaan.');
+            }
+
+            // 2. Ambil data untuk notifikasi (setelah update sukses)
+            $pekerjaanInfo = DB::table('pekerjaan')
+                ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+                ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+                ->join('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
+                ->select(
+                    'lowongan.judul as judul_lowongan',
+                    'pekerja.idUser as idUserPekerja'
+                )
+                ->where('pekerjaan.idPekerjaan', $id)
+                ->first();
+
             // 3. Buat notifikasi untuk pekerja
-            DB::table('notifikasi')->insert([
-                'idUser' => $pekerjaan->idUserPekerja,
-                'judul' => 'Pekerjaan Selesai',
-                'pesan' => "Pekerjaan '{$pekerjaan->judul_lowongan}' telah dikonfirmasi selesai. Jangan lupa berikan rating!",
-                'status_baca' => 0,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            if ($pekerjaanInfo) {
+                DB::table('notifikasi')->insert([
+                    'idUser' => $pekerjaanInfo->idUserPekerja,
+                    'pesan' => "Pekerjaan '<strong>{$pekerjaanInfo->judul_lowongan}</strong>' telah dikonfirmasi selesai. Anda mendapatkan rating!",
+                    'tipe_notifikasi' => 'info',
+                    'is_read' => false,
+                    'created_at' => now()
+                ]);
+            }
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Pekerjaan berhasil dikonfirmasi selesai! Anda dapat memberikan rating sekarang.');
+            return redirect()->back()->with('success', 'Pekerjaan berhasil dikonfirmasi selesai!');
 
         } catch (\Exception $e) {
             DB::rollBack();

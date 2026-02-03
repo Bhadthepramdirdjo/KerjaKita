@@ -94,7 +94,7 @@ class LowonganController extends Controller
                 ->with('error', 'Lowongan tidak ditemukan');
         }
 
-        return view('pemberi-kerja.pekerjaan.edit-lowongan', compact('lowongan'));
+        return view('pemberi-kerja.lowongan.edit-lowongan', compact('lowongan'));
     }
 
     /**
@@ -102,12 +102,19 @@ class LowonganController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Sanitasi format upah (hapus titik)
+        if ($request->has('upah')) {
+            $request->merge([
+                'upah' => str_replace('.', '', $request->upah)
+            ]);
+        }
+
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'lokasi' => 'required|string|max:255',
             'upah' => 'required|numeric|min:0',
-            'kategori' => 'required|string|max:100',
+            'kategori' => 'required', // Bisa ID atau string ID
             'status' => 'required|in:aktif,draft,selesai'
         ]);
 
@@ -118,10 +125,24 @@ class LowonganController extends Controller
                 'deskripsi' => $validated['deskripsi'],
                 'lokasi' => $validated['lokasi'],
                 'upah' => $validated['upah'],
-                'kategori' => $validated['kategori'],
+                // kategori dihapus dari sini karena beda tabel
                 'status' => $validated['status'],
                 'updated_at' => now()
             ]);
+
+        // Update kategori di tabel relasi
+        $exists_kat = DB::table('lowongan_kategori')->where('idLowongan', $id)->exists();
+        
+        if ($exists_kat) {
+            DB::table('lowongan_kategori')
+                ->where('idLowongan', $id)
+                ->update(['id_kategori' => $validated['kategori']]);
+        } else {
+            DB::table('lowongan_kategori')->insert([
+                'idLowongan' => $id,
+                'id_kategori' => $validated['kategori']
+            ]);
+        }
 
         return redirect()
             ->route('pemberi-kerja.lowongan-saya')

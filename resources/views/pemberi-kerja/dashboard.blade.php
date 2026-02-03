@@ -124,8 +124,11 @@
             <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
-            <a href="{{ route('pemberi-kerja.lowongan-saya') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
+            <a href="{{ route('pemberi-kerja.lowongan-saya') }}" class="relative w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-briefcase text-2xl"></i>
+                @if(isset($notifikasiLamaranBaru) && $notifikasiLamaranBaru > 0)
+                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">{{ $notifikasiLamaranBaru }}</span>
+                @endif
             </a>
         </div>
         <div class="mt-auto"></div>

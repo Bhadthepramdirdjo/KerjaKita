@@ -82,7 +82,91 @@
         }
 
         .notification-item.unread {
-            background-color: #F0FAFB;
+            background-color: #e0f7fa;
+            border-left-color: #146B8C;
+        }
+
+        /* Range Slider Styling */
+        .range-slider {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: transparent;
+            pointer-events: none;
+            -webkit-appearance: none;
+            appearance: none;
+            z-index: 1;
+        }
+
+        .range-slider::-webkit-slider-track {
+            background: transparent;
+            height: 2px;
+        }
+
+        .range-slider::-moz-range-track {
+            background: transparent;
+            height: 2px;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #289FB7;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            pointer-events: auto;
+            position: relative;
+            margin-top: -6px;
+            z-index: 2;
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #289FB7;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            pointer-events: auto;
+            margin-top: -6px;
+            z-index: 2;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            background: #146B8C;
+            transform: scale(1.1);
+        }
+
+        .range-slider::-moz-range-thumb:hover {
+            background: #146B8C;
+            transform: scale(1.1);
+        }
+
+        .range-slider::-webkit-slider-thumb:active {
+            background: #0f5a73;
+        }
+
+        .range-slider::-moz-range-thumb:active {
+            background: #0f5a73;
+        }
+
+        /* Z-index management */
+        .range-min {
+            z-index: 1;
+        }
+
+        .range-max {
+            z-index: 2;
+        }
+
+        .range-slider:focus {
+            outline: none;
+            z-index: 3;
         }
     </style>
 </head>
@@ -107,6 +191,11 @@
             <button id="filterToggle" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
+            
+            <!-- Lamaran Saya Button -->
+            <a href="{{ route('pekerja.lamaran') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
+                <i class="fas fa-briefcase text-2xl"></i>
+            </a>
         </div>
         
         <!-- Bottom Placeholder -->
@@ -179,8 +268,82 @@
                 </div>
             </div>
 
+            <hr class="my-6 border-gray-200">
+
+            <!-- Range Harga/Upah -->
+            <!-- Range Harga/Upah -->
+            <div class="mb-4">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Range Upah</h3>
+                <div class="px-3">
+                    <!-- Display Range Values -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-seafoam-bloom bg-opacity-20 px-3 py-2 rounded-lg">
+                            <span class="text-xs text-gray-600 block">Min</span>
+                            <span class="text-sm font-bold text-pelagic-blue" id="minPriceDisplay">Rp 0</span>
+                        </div>
+                        <div class="text-gray-400">-</div>
+                        <div class="bg-seafoam-bloom bg-opacity-20 px-3 py-2 rounded-lg">
+                            <span class="text-xs text-gray-600 block">Max</span>
+                            <span class="text-sm font-bold text-pelagic-blue" id="maxPriceDisplay">Rp 10.000.000</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Preset Buttons (moved to top) -->
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <button type="button" class="preset-btn text-xs py-2 px-3 bg-gray-100 hover:bg-pelagic-blue hover:text-white rounded-lg transition-colors" data-min="0" data-max="1000000">
+                            < 1 Juta
+                        </button>
+                        <button type="button" class="preset-btn text-xs py-2 px-3 bg-gray-100 hover:bg-pelagic-blue hover:text-white rounded-lg transition-colors" data-min="1000000" data-max="3000000">
+                            1-3 Juta
+                        </button>
+                        <button type="button" class="preset-btn text-xs py-2 px-3 bg-gray-100 hover:bg-pelagic-blue hover:text-white rounded-lg transition-colors" data-min="3000000" data-max="5000000">
+                            3-5 Juta
+                        </button>
+                        <button type="button" class="preset-btn text-xs py-2 px-3 bg-gray-100 hover:bg-pelagic-blue hover:text-white rounded-lg transition-colors" data-min="5000000" data-max="10000000">
+                            > 5 Juta
+                        </button>
+                    </div>
+
+                    <!-- Range Slider Container with fixed height -->
+                    <div class="relative" style="height: 40px;">
+                        <div class="relative" style="height: 30px; overflow: hidden;">
+                            <!-- Background Track -->
+                            <div class="relative h-2 bg-gray-200 rounded-full" style="top: 14px;">
+                                <!-- Active Range Track -->
+                                <div id="rangeTrack" class="absolute h-full bg-pelagic-blue rounded-full" style="left: 0%; right: 0%;"></div>
+                            </div>
+                            
+                            <!-- Slider Wrapper -->
+                            <div class="relative" style="top: 9px;">
+                                <!-- Min Range Input -->
+                                <input type="range" 
+                                       id="minPrice" 
+                                       name="min_upah"
+                                       min="0" 
+                                       max="10000000" 
+                                       step="100000"
+                                       value="0"
+                                       class="range-slider range-min">
+                                
+                                <!-- Max Range Input -->
+                                <input type="range" 
+                                       id="maxPrice" 
+                                       name="max_upah"
+                                       min="0" 
+                                       max="10000000" 
+                                       step="100000"
+                                       value="10000000"
+                                       class="range-slider range-max">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 border-gray-200">
+
             <!-- Action Buttons -->
-            <div class="sticky bottom-0 bg-white pt-4 pb-2 space-y-3">
+            <div class="sticky bottom-0 bg-white pt-2 pb-2 space-y-3 z-50">
                 <button class="w-full bg-pelagic-blue hover:bg-abyss-teal text-white font-bold py-3 px-6 rounded-full transition-colors shadow-lg">
                     <i class="fas fa-filter mr-2"></i>
                     Terapkan Filter
@@ -227,9 +390,9 @@
             </button>
 
             <!-- Profile Icon -->
-            <button class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
+            <a href="{{ route('pekerja.profil') }}" class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
                 <i class="far fa-user text-2xl text-keel-black"></i>
-            </button>
+            </a>
         </header>
 
         <!-- Page Title -->
@@ -241,36 +404,36 @@
         <div class="flex-1 overflow-y-auto no-scrollbar px-4 sm:px-8 pb-20">
             
             <!-- Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 
                 @forelse($lowongan as $job)
                 <!-- Job Card Component -->
                 <a href="{{ route('pekerja.lowongan.detail', $job->idLowongan) }}" class="block">
-                    <div class="bg-keel-black rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 cursor-pointer">
+                    <div class="bg-keel-black rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 cursor-pointer">
                         <!-- Card Body -->
-                        <div class="p-6 h-48 flex flex-col relative">
+                        <div class="p-4 h-32 flex flex-col relative">
                             <!-- Decorative gradient overlay -->
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-pelagic-blue to-transparent opacity-20 rounded-bl-full"></div>
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pelagic-blue to-transparent opacity-20 rounded-bl-full"></div>
                             
-                            <h3 class="text-white text-xl font-bold mb-2 z-10 line-clamp-1">{{ $job->judul }}</h3>
-                            <p class="text-gray-300 text-sm line-clamp-3 z-10 flex-grow">
+                            <h3 class="text-white text-base font-bold mb-1.5 z-10 line-clamp-1">{{ $job->judul }}</h3>
+                            <p class="text-gray-300 text-xs line-clamp-2 z-10 flex-grow">
                                 {{ $job->deskripsi }}
                             </p>
                         </div>
 
                         <!-- Card Footer (Details) -->
-                        <div class="bg-[#1a2526] px-6 py-4 border-t border-gray-700">
-                            <div class="flex items-center justify-between text-white text-sm mb-2">
+                        <div class="bg-[#1a2526] px-4 py-3 border-t border-gray-700">
+                            <div class="flex items-center justify-between text-white text-xs mb-1.5">
                                 <span class="font-medium text-seafoam-bloom">Bayaran :</span>
                                 <span class="font-bold">Rp {{ number_format($job->upah, 0, ',', '.') }}</span>
                             </div>
-                            <div class="flex items-center justify-between text-white text-sm">
-                                <span class="text-gray-400">Durasi kerja: <span class="text-white">-</span></span>
+                            <div class="flex items-center justify-between text-white text-xs">
+                                <span class="text-gray-400 text-[10px]">Durasi: <span class="text-white">-</span></span>
                                 
                                 <!-- Location Icon/Text -->
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs text-gray-400">{{ Str::limit($job->lokasi, 15) }}</span>
-                                    <i class="fas fa-map-marker-alt text-pelagic-blue"></i>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] text-gray-400">{{ Str::limit($job->lokasi, 12) }}</span>
+                                    <i class="fas fa-map-marker-alt text-pelagic-blue text-xs"></i>
                                 </div>
                             </div>
                         </div>
@@ -338,6 +501,86 @@
                 item.classList.remove('unread');
             }
         }
+
+        // Range Slider Functionality
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const minPriceDisplay = document.getElementById('minPriceDisplay');
+        const maxPriceDisplay = document.getElementById('maxPriceDisplay');
+        const rangeTrack = document.getElementById('rangeTrack');
+
+        // Format number to Rupiah
+        function formatRupiah(number) {
+            return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        // Update range display and track
+        function updateRange() {
+            let minVal = parseInt(minPrice.value);
+            let maxVal = parseInt(maxPrice.value);
+
+            // Prevent overlap
+            if (minVal > maxVal - 100000) {
+                minVal = maxVal - 100000;
+                minPrice.value = minVal;
+            }
+
+            if (maxVal < minVal + 100000) {
+                maxVal = minVal + 100000;
+                maxPrice.value = maxVal;
+            }
+
+            // Update display
+            minPriceDisplay.textContent = formatRupiah(minVal);
+            maxPriceDisplay.textContent = formatRupiah(maxVal);
+
+            // Update track visual
+            const percentMin = (minVal / 10000000) * 100;
+            const percentMax = (maxVal / 10000000) * 100;
+            rangeTrack.style.left = percentMin + '%';
+            rangeTrack.style.right = (100 - percentMax) + '%';
+        }
+
+        // Event listeners for sliders
+        minPrice.addEventListener('input', updateRange);
+        maxPrice.addEventListener('input', updateRange);
+
+        // Bring to front when interacting
+        minPrice.addEventListener('mousedown', function() {
+            this.style.zIndex = '5';
+        });
+
+        maxPrice.addEventListener('mousedown', function() {
+            this.style.zIndex = '5';
+        });
+
+        minPrice.addEventListener('mouseup', function() {
+            this.style.zIndex = '3';
+        });
+
+        maxPrice.addEventListener('mouseup', function() {
+            this.style.zIndex = '4';
+        });
+
+        // Preset buttons functionality
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const min = this.getAttribute('data-min');
+                const max = this.getAttribute('data-max');
+                
+                minPrice.value = min;
+                maxPrice.value = max;
+                updateRange();
+
+                // Visual feedback
+                presetButtons.forEach(btn => btn.classList.remove('bg-pelagic-blue', 'text-white'));
+                this.classList.add('bg-pelagic-blue', 'text-white');
+            });
+        });
+
+        // Initialize range on load
+        updateRange();
     </script>
 
     <!-- Notification Dropdown -->
@@ -351,7 +594,7 @@
         <!-- Notifikasi List -->
         <div class="divide-y divide-gray-200">
             @forelse($notifikasi as $notif)
-                <div class="notification-item p-4 {{ !$notif->is_read ? 'unread' : '' }}" data-notification-id="{{ $notif->idNotifikasi }}">
+                <div class="notification-item p-4 {{ !$notif->is_read ? 'unread' : '' }}" data-notification-id="{{ $notif->id_notifikasi }}">
                     <!-- Header Notifikasi -->
                     <div class="flex items-start gap-3 mb-2">
                         @if($notif->tipe_notifikasi == 'rating')
@@ -387,7 +630,7 @@
 
                     <!-- Message -->
                     <p class="text-gray-700 text-sm leading-relaxed ml-13">
-                        {{ $notif->pesan }}
+                        {!! $notif->pesan !!}
                     </p>
 
                     <!-- Timestamp -->
@@ -407,5 +650,24 @@
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBtn = document.getElementById('notificationBtn');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+
+            // Toggle Dropdown
+            notificationBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('hidden');
+            });
+
+            // Close Dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

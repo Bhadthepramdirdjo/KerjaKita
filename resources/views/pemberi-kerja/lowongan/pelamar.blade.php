@@ -179,7 +179,7 @@
                                     </div>
 
                                     <!-- Status Badge -->
-                                    @if($p->status_lamaran == 'menunggu')
+                                    @if($p->status_lamaran == 'pending')
                                         <span class="px-4 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">Menunggu</span>
                                     @elseif($p->status_lamaran == 'diterima')
                                         <span class="px-4 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Diterima</span>
@@ -216,16 +216,21 @@
                                     Melamar pada {{ \Carbon\Carbon::parse($p->tanggal_lamaran)->format('d M Y, H:i') }}
                                 </div>
 
+                                <!-- Lihat Profil Button -->
+                                <div class="mb-4">
+                                    <a href="{{ route('pemberi-kerja.profil-pelamar', $p->idPekerja) }}" class="inline-flex items-center justify-center w-full px-6 py-2 border-2 border-pelagic-blue text-pelagic-blue font-bold rounded-full hover:bg-pelagic-blue hover:text-white transition-colors">
+                                        <i class="fas fa-user-circle mr-2"></i>
+                                        Lihat Profil Lengkap
+                                    </a>
+                                </div>
+
                                 <!-- Action Buttons -->
-                                @if($p->status_lamaran == 'menunggu')
+                                @if($p->status_lamaran == 'pending')
                                 <div class="flex gap-3">
-                                    <form action="{{ route('pemberi-kerja.lamaran.terima', $p->idLamaran) }}" method="POST" class="flex-1">
-                                        @csrf
-                                        <button type="submit" onclick="return confirm('Yakin ingin menerima pelamar ini? Lamaran lain akan otomatis ditolak.')" class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-colors shadow-lg">
-                                            <i class="fas fa-check mr-2"></i>
-                                            Terima Pelamar
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="openModalTerima('{{ route('pemberi-kerja.lamaran.terima', $p->idLamaran) }}')" class="flex-1 w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-colors shadow-lg">
+                                        <i class="fas fa-check mr-2"></i>
+                                        Terima Pelamar
+                                    </button>
 
                                     <form action="{{ route('pemberi-kerja.lamaran.tolak', $p->idLamaran) }}" method="POST" class="flex-1">
                                         @csrf
@@ -248,5 +253,90 @@
         </div>
     </main>
 
+    <!-- Modal Konfirmasi Terima -->
+    <div id="modalTerima" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop Blur -->
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity opacity-0 duration-300 ease-out" id="modalBackdrop"></div>
+
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <!-- Modal Panel -->
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300 ease-out" id="modalPanel">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-12 sm:w-12">
+                            <i class="fas fa-check text-green-600 text-xl"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <h3 class="text-xl font-bold leading-6 text-keel-black" id="modal-title">Konfirmasi Penerimaan</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 leading-relaxed">
+                                    Yakin ingin menerima pelamar ini? <br>
+                                    <span class="text-red-500 font-medium">Warning:</span> Lamaran lain untuk lowongan ini akan otomatis <strong>Ditolak</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
+                    <!-- Form untuk Submit -->
+                    <form id="formTerima" method="POST" action="" class="w-full sm:w-auto">
+                        @csrf
+                        <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-green-500 transition-all duration-200">
+                            Ya, Terima Pelamar
+                        </button>
+                    </form>
+                    <button type="button" onclick="closeModalTerima()" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all duration-200 sm:mt-0 sm:w-auto">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModalTerima(url) {
+            const modal = document.getElementById('modalTerima');
+            const backdrop = document.getElementById('modalBackdrop');
+            const panel = document.getElementById('modalPanel');
+            const form = document.getElementById('formTerima');
+            
+            // Set action URL
+            form.action = url;
+            
+            // Show modal container
+            modal.classList.remove('hidden');
+            
+            // Trigger animation in
+            // Gunakan requestAnimationFrame agar browser me-paint state hidden->block dulu
+            requestAnimationFrame(() => {
+                backdrop.classList.remove('opacity-0');
+                panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+                panel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+            });
+        }
+
+        function closeModalTerima() {
+            const modal = document.getElementById('modalTerima');
+            const backdrop = document.getElementById('modalBackdrop');
+            const panel = document.getElementById('modalPanel');
+            
+            // Trigger animation out
+            backdrop.classList.add('opacity-0');
+            panel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+            panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+            
+            // Hide modal container after transition finishes (300ms)
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Close modal on click outside
+        document.getElementById('modalTerima').addEventListener('click', function(e) {
+            if (e.target === this || e.target.id === 'modalBackdrop') {
+                closeModalTerima();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -71,16 +71,21 @@ Route::middleware(['auth'])->group(function () {
         // Pekerjaan Routes
         Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
         Route::get('/pekerjaan/{id}', [PekerjaanController::class, 'show'])->name('pekerjaan.detail');
+        Route::get('/profil-pelamar/{id}', [PemberiKerjaController::class, 'profilPelamar'])->name('profil-pelamar');
     });
     
     // Pekerja Routes
     Route::prefix('pekerja')->name('pekerja.')->group(function () {
         Route::get('/dashboard', [PekerjaController::class, 'dashboard'])->name('dashboard');
         Route::get('/pengaturan', [PekerjaController::class, 'pengaturan'])->name('pengaturan');
+        Route::get('/lamaran', [PekerjaController::class, 'lamaran'])->name('lamaran');
+        Route::get('/profil', [PekerjaController::class, 'profil'])->name('profil');
+        Route::put('/profil', [PekerjaController::class, 'updateProfil'])->name('profil.update');
         Route::get('/cari-pekerjaan', [PekerjaController::class, 'cariPekerjaan'])->name('cari-pekerjaan');
         Route::get('/lowongan/{id}', [PekerjaController::class, 'detailLowongan'])->name('lowongan.detail');
         Route::post('/lowongan/{id}/lamar', [LamaranController::class, 'lamar'])->name('lowongan.lamar');
-        Route::get('/lamaran', [LamaranController::class, 'index'])->name('lamaran.index');
+        Route::get('/lamaran-list', [LamaranController::class, 'index'])->name('lamaran.index');
+        Route::post('/keahlian', [PekerjaController::class, 'tambahKeahlian'])->name('keahlian.tambah');
     });
     
     // FITUR 8: Rating Routes (untuk kedua pihak)
