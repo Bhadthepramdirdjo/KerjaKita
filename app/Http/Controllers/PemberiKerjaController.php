@@ -438,7 +438,13 @@ class PemberiKerjaController extends Controller
             ->where('idPemberiKerja', $idPemberiKerja)
             ->first();
 
-        return view('pemberi-kerja.profil', compact('user', 'pemberiKerja'));
+        // Ambil riwayat lowongan
+        $riwayatLowongan = DB::table('lowongan')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pemberi-kerja.profil', compact('user', 'pemberiKerja', 'riwayatLowongan'));
     }
 
     /**
