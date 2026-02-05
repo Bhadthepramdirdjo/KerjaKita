@@ -425,4 +425,71 @@ class PemberiKerjaController extends Controller
         return redirect()->route('pemberi-kerja.lowongan-saya')
             ->with('success', 'Lowongan berhasil dipublikasikan!');
     }
+
+    /**
+     * Halaman Profil Pemberi Kerja
+     */
+    public function profil()
+    {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        $user = Auth::user();
+        
+        $pemberiKerja = DB::table('PemberiKerja')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->first();
+
+        return view('pemberi-kerja.profil', compact('user', 'pemberiKerja'));
+    }
+
+    /**
+     * Update Profil Pemberi Kerja
+     */
+    public function updateProfil(Request $request)
+    {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:user,email,' . $user->idUser . ',idUser',
+            'nama_perusahaan' => 'nullable|string|max:255',
+            'alamat' => 'nullable|string',
+            'no_telp' => 'nullable|string|max:20',
+            'foto_profil' => 'nullable|image|max:2048'
+        ]);
+
+        // Update user data
+        DB::table('user')
+            ->where('idUser', $user->idUser)
+            ->update([
+                'nama' => $validated['nama'],
+                'email' => $validated['email'],
+                'foto_profil' => $user->foto_profil, // Will update separately if new file
+                'updated_at' => now()
+            ]);
+
+        // Update pemberi kerja data
+        DB::table('PemberiKerja')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->update([
+                'nama_perusahaan' => $validated['nama_perusahaan'],
+                'alamat' => $validated['alamat'],
+                'no_telp' => $validated['no_telp'],
+                'updated_at' => now()
+            ]);
+
+        // Handle profile picture upload
+        if ($request->hasFile('foto_profil')) {
+            $file = $request->file('foto_profil');
+            $fileName = 'profil_' . $user->idUser . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('profil', $fileName, 'public');
+
+            DB::table('user')
+                ->where('idUser', $user->idUser)
+                ->update(['foto_profil' => 'profil/' . $fileName]);
+        }
+
+        return redirect()->route('pemberi-kerja.profil')
+            ->with('success', 'Profil berhasil diperbarui!');
+    }
 }
