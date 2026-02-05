@@ -86,17 +86,19 @@ class PemberiKerjaController extends Controller
             ->count();
 
         // 2. Ambil Daftar Pekerjaan (untuk Slider)
-        // Kita ambil pekerjaan terbaru per lamaran untuk avoid duplikat
+        // Kita ambil pekerjaan terbaru, tapi hanya satu per lowongan (hindari duplikat)
         $pekerjaanList = DB::table('pekerjaan as pk1')
-            ->select('pk1.*')
-            ->whereRaw('pk1.idPekerjaan = (
-                SELECT MAX(pk2.idPekerjaan) 
-                FROM pekerjaan pk2 
-                WHERE pk2.idLamaran = pk1.idLamaran
-            )')
+            ->select('pk1.idPekerjaan')
             ->join('lamaran', 'pk1.idLamaran', '=', 'lamaran.idLamaran')
             ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
             ->where('lowongan.idPemberiKerja', $idPemberiKerja)
+            ->whereRaw('pk1.idPekerjaan = (
+                SELECT MAX(pk2.idPekerjaan) 
+                FROM pekerjaan pk2 
+                JOIN lamaran lm ON pk2.idLamaran = lm.idLamaran
+                JOIN lowongan lw ON lm.idLowongan = lw.idLowongan
+                WHERE lw.idLowongan = lowongan.idLowongan
+            )')
             ->pluck('pk1.idPekerjaan')
             ->toArray();
         
@@ -104,7 +106,7 @@ class PemberiKerjaController extends Controller
             ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
             ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
             ->join('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
-            ->join('user', 'pekerja.idUser', '=', 'user.idUser') // Ambil nama pekerja
+            ->join('user', 'pekerja.idUser', '=', 'user.idUser')
             ->select(
                 'pekerjaan.idPekerjaan',
                 'pekerjaan.status_pekerjaan',

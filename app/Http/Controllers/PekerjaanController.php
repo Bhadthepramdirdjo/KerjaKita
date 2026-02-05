@@ -150,7 +150,7 @@ class PekerjaanController extends Controller
                 'user.nama as nama_pekerja',
                 'user.email as email_pekerja',
                 'pekerja.keahlian',
-                'pekerja.noHP',
+                'pekerja.no_telp',
                 'lamaran.idPekerja',
                 'lowongan.idPemberiKerja'
             )
