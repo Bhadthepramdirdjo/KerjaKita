@@ -113,10 +113,6 @@
                             Sedang Dikerjakan
                             <span class="ml-2 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs">{{ $working->count() }}</span>
                         </button>
-                        <button onclick="switchTab('completed')" id="tab-completed" class="tab-button border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 py-4 px-1 text-sm font-medium">
-                            Riwayat
-                            <span class="ml-2 bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs">{{ $completed->count() }}</span>
-                        </button>
                     </nav>
                 </div>
             </div>
@@ -211,59 +207,6 @@
                         <i class="fas fa-briefcase text-6xl text-gray-300 mb-4"></i>
                         <h3 class="text-xl font-bold text-gray-700 mb-2">Tidak Ada Pekerjaan Aktif</h3>
                         <p class="text-gray-500">Anda belum memiliki pekerjaan yang sedang dikerjakan</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-
-            <!-- Tab Content: Riwayat -->
-            <div id="content-completed" class="tab-content hidden">
-                <div class="space-y-4">
-                    @forelse($completed as $riwayat)
-                    <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="text-lg font-bold text-keel-black mb-2">{{ $riwayat->judul }}</h3>
-                                <p class="text-gray-600 mb-3">{{ $riwayat->nama_perusahaan }}</p>
-                                
-                                <div class="flex flex-wrap gap-3 mb-4">
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <i class="fas fa-map-marker-alt mr-2 text-pelagic-blue"></i>
-                                        {{ $riwayat->lokasi }}
-                                    </div>
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <i class="fas fa-calendar mr-2 text-pelagic-blue"></i>
-                                        Selesai: {{ \Carbon\Carbon::parse($riwayat->tanggal_selesai)->format('d M Y') }}
-                                    </div>
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <i class="fas fa-money-bill-wave mr-2 text-pelagic-blue"></i>
-                                        Rp {{ number_format($riwayat->upah, 0, ',', '.') }}
-                                    </div>
-                                </div>
-                                
-                                @if($riwayat->status_lamaran == 'selesai')
-                                    <span class="status-badge status-completed">
-                                        <i class="fas fa-check-circle mr-1"></i>
-                                        Selesai
-                                    </span>
-                                @elseif($riwayat->status_lamaran == 'ditolak')
-                                    <span class="status-badge status-rejected">
-                                        <i class="fas fa-times-circle mr-1"></i>
-                                        Ditolak
-                                    </span>
-                                @endif
-                            </div>
-                            
-                            <a href="{{ route('pekerja.lowongan.detail', $riwayat->idLowongan) }}" class="ml-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-keel-black rounded-lg transition-colors text-sm font-medium">
-                                Lihat Detail
-                            </a>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="bg-white rounded-2xl p-12 text-center">
-                        <i class="fas fa-history text-6xl text-gray-300 mb-4"></i>
-                        <h3 class="text-xl font-bold text-gray-700 mb-2">Belum Ada Riwayat</h3>
-                        <p class="text-gray-500">Anda belum memiliki riwayat pekerjaan</p>
                     </div>
                     @endforelse
                 </div>

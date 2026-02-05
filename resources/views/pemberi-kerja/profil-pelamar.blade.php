@@ -187,6 +187,66 @@
                 </div>
             </div>
 
+            <!-- Reviews Section -->
+            <div class="bg-white rounded-3xl shadow-xl p-8 mt-6 mb-10">
+                <div class="flex items-center gap-3 mb-6">
+                    <h2 class="text-2xl font-bold text-keel-black">Ulasan & Rating</h2>
+                    <span class="bg-seafoam-bloom text-abyss-teal text-xs font-bold px-3 py-1 rounded-full">
+                        {{ $totalRating ?? 0 }} Total
+                    </span>
+                </div>
+                
+                <div class="space-y-6">
+                    @forelse($ulasanList as $review)
+                    <div class="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-pelagic-blue flex items-center justify-center text-white text-lg font-bold">
+                                    {{ substr($review->nama_pemberi_kerja, 0, 1) }}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-keel-black">{{ $review->nama_pemberi_kerja }}</h4>
+                                    <p class="text-xs text-gray-500">{{ $review->judul_pekerjaan }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex items-center justify-end gap-1 text-yellow-400 mb-1">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $review->nilai_rating)
+                                            <i class="fas fa-star text-sm"></i>
+                                        @else
+                                            <i class="far fa-star text-sm text-gray-300"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="text-sm font-bold text-gray-700 ml-1">{{ $review->nilai_rating }}.0</span>
+                                </div>
+                                <p class="text-xs text-gray-400">
+                                    {{ \Carbon\Carbon::parse($review->created_at)->translatedFormat('d F Y') }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                            @php
+                                $ulasan = $review->ulasan;
+                                // Remove "Bersedia bekerja lagi" line
+                                $ulasan = preg_replace('/\n*Bersedia bekerja lagi:.*$/m', '', $ulasan);
+                                $ulasan = trim($ulasan);
+                            @endphp
+                            {{ $ulasan }}
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
+                            <i class="far fa-comment-dots text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">Belum ada ulasan yang diterima.</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+
         </div>
     </main>
 

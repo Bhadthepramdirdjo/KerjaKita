@@ -256,6 +256,11 @@
                                 <span class="block text-xs font-bold text-gray-500 mb-0.5">Pekerja :</span>
                                 <div class="font-bold text-gray-800 flex items-center gap-2">
                                      {{ $job->nama_pekerja }}
+                                    @if($job->idPekerja)
+                                        <a href="{{ route('pekerja.profil.publik', $job->idPekerja) }}" target="_blank" class="ml-auto text-pelagic-blue hover:text-abyss-teal transition-colors">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </div>

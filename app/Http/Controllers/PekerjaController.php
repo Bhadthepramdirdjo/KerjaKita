@@ -98,6 +98,7 @@ class PekerjaController extends Controller
             ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
             ->where('lamaran.idPekerja', $pekerja->idPekerja)
             ->whereIn('lamaran.status_lamaran', ['pending', 'diajukan'])
+            ->where('lowongan.status', 'aktif')
             ->select(
                 'lamaran.*',
                 'lowongan.judul',
@@ -114,19 +115,24 @@ class PekerjaController extends Controller
         $working = DB::table('lamaran')
             ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
             ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
-            ->leftJoin('pekerjaan', 'lamaran.idLamaran', '=', 'pekerjaan.idLamaran')
             ->where('lamaran.idPekerja', $pekerja->idPekerja)
             ->where(function($query) {
-                 // Kondisi 1: Explicitly running in Pekerjaan table
-                 $query->where('pekerjaan.status_pekerjaan', 'berjalan')
-                 // Kondisi 2: Legacy accepted (status lamaran diterima dan belum selesai di pekerjaan)
-                       ->orWhere(function($q) {
-                           $q->whereIn('lamaran.status_lamaran', ['diterima', 'accepted', 'sedang_dikerjakan'])
-                             ->where(function($sub) {
-                                 $sub->whereNull('pekerjaan.status_pekerjaan')
-                                     ->orWhere('pekerjaan.status_pekerjaan', '!=', 'selesai');
-                             });
+                 // Get the latest pekerjaan for each lamaran
+                 $query->whereIn('lamaran.idLamaran', function($subquery) {
+                    $subquery->select('idLamaran')
+                        ->from('pekerjaan')
+                        ->where('status_pekerjaan', 'berjalan')
+                        ->distinct();
+                 })
+                 // OR lamaran is diterima/accepted with no selesai pekerjaan
+                 ->orWhere(function($q) {
+                     $q->whereIn('lamaran.status_lamaran', ['diterima', 'accepted', 'sedang_dikerjakan'])
+                       ->whereNotIn('lamaran.idLamaran', function($sub) {
+                           $sub->select('idLamaran')
+                               ->from('pekerjaan')
+                               ->where('status_pekerjaan', 'selesai');
                        });
+                 });
             })
             ->select(
                 'lamaran.*',
@@ -135,38 +141,13 @@ class PekerjaController extends Controller
                 'lowongan.upah',
                 'lowongan.idLowongan',
                 'PemberiKerja.nama_perusahaan',
-                'lamaran.updated_at as tanggal_mulai',
-                'pekerjaan.status_pekerjaan',
-                'pekerjaan.idPekerjaan'
+                'lamaran.updated_at as tanggal_mulai'
             )
+            ->distinct()
             ->orderBy('lamaran.updated_at', 'desc')
             ->get();
         
-        // Riwayat (status: selesai/ditolak di lamaran OR status_pekerjaan selesai)
-        $completed = DB::table('lamaran')
-            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-            ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
-            ->leftJoin('pekerjaan', 'lamaran.idLamaran', '=', 'pekerjaan.idLamaran')
-            ->where('lamaran.idPekerja', $pekerja->idPekerja)
-            ->where(function($query) {
-                 $query->where('pekerjaan.status_pekerjaan', 'selesai')
-                       ->orWhereIn('lamaran.status_lamaran', ['selesai', 'ditolak', 'rejected', 'completed']);
-            })
-            ->select(
-                'lamaran.*',
-                'lowongan.judul',
-                'lowongan.lokasi',
-                'lowongan.upah',
-                'lowongan.idLowongan',
-                'PemberiKerja.nama_perusahaan',
-                'lamaran.updated_at as tanggal_selesai',
-                'pekerjaan.status_pekerjaan',
-                'pekerjaan.idPekerjaan'
-            )
-            ->orderBy('lamaran.updated_at', 'desc')
-            ->get();
-        
-        return view('pekerja.lamaran', compact('pending', 'working', 'completed'));
+        return view('pekerja.lamaran', compact('pending', 'working'));
     }
     
     /**
@@ -345,7 +326,7 @@ class PekerjaController extends Controller
             ->orderBy('rating.created_at', 'desc')
             ->get();
         
-        return view('pekerja.profil', compact('pekerja', 'rating', 'totalRating', 'pengalamanKerja', 'ulasanList'));
+        return view('pekerja.profil-publik', compact('pekerja', 'rating', 'totalRating', 'pengalamanKerja', 'ulasanList'));
     }
     
     /**

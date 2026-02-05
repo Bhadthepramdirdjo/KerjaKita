@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 05 Feb 2026 pada 06.59
+-- Waktu pembuatan: 05 Feb 2026 pada 09.41
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -153,7 +153,19 @@ INSERT INTO `activity_log` (`id_log`, `idUser`, `activity_type`, `description`, 
 (67, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 22:07:05'),
 (68, 6, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 22:07:27'),
 (69, 6, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 22:33:59'),
-(70, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 22:34:46');
+(70, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 22:34:46'),
+(71, 5, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 23:30:27'),
+(72, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 23:30:42'),
+(73, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-05 00:08:06'),
+(74, 6, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-05 00:09:13'),
+(75, 6, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-05 00:09:50'),
+(76, 3, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-05 00:10:06'),
+(77, 3, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-05 00:52:53'),
+(78, 2, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-05 00:53:12'),
+(79, 2, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-05 00:54:33'),
+(80, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-05 00:54:41'),
+(81, 2, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-05 01:28:49'),
+(82, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-05 01:30:26');
 
 -- --------------------------------------------------------
 
@@ -261,12 +273,14 @@ CREATE TABLE `lamaran` (
 
 INSERT INTO `lamaran` (`idLamaran`, `idLowongan`, `idPekerja`, `tanggal_lamaran`, `status_lamaran`, `is_read`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, '0000-00-00', 'diterima', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(2, 2, 1, '0000-00-00', 'tertarik', 0, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(2, 2, 1, '0000-00-00', 'tertarik', 1, '2026-02-05 05:21:19', '2026-02-05 06:30:48'),
 (3, 3, 1, '0000-00-00', 'ditolak', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
 (4, 4, 2, '0000-00-00', 'diterima', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(5, 5, 2, '0000-00-00', 'tertarik', 0, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(5, 5, 2, '0000-00-00', 'tertarik', 1, '2026-02-05 05:21:19', '2026-02-05 07:10:10'),
 (6, 1, 3, '0000-00-00', 'diterima', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(7, 6, 3, '0000-00-00', 'tertarik', 0, '2026-02-05 05:21:19', '2026-02-05 05:21:19');
+(7, 6, 3, '0000-00-00', 'tertarik', 1, '2026-02-05 05:21:19', '2026-02-05 07:10:10'),
+(13, 25, 1, '2026-02-05', 'diterima', 1, '2026-02-05 01:09:55', '2026-02-05 01:10:17'),
+(14, 2, 3, '2026-02-05', 'diterima', 1, '2026-02-05 01:31:21', '2026-02-05 01:31:35');
 
 -- --------------------------------------------------------
 
@@ -293,13 +307,14 @@ CREATE TABLE `lowongan` (
 
 INSERT INTO `lowongan` (`idLowongan`, `idPemberiKerja`, `judul`, `deskripsi`, `gambar`, `lokasi`, `upah`, `status`, `created_at`, `updated_at`) VALUES
 (1, 1, 'Developer Backend PHP', 'Dibutuhkan developer PHP berpengalaman untuk project web application', NULL, 'Bandung', 1500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(2, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', NULL, 'Bandung', 1200000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(3, 2, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(2, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', 'lowongan/63ctlWvUCffg4Pz8iyFfx8lDkIlhBbNWqUlOniwc.png', 'Bandung', 1200000.00, 'tidak_aktif', '2026-02-05 05:21:19', '2026-02-05 01:31:35'),
+(3, 2, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 06:52:04'),
 (4, 2, 'Content Writer Profesional', 'Menulis artikel berkualitas untuk blog perusahaan kami', NULL, 'Jakarta', 800000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
 (5, 2, 'Social Media Manager', 'Kelola social media dan buat konten menarik', NULL, 'Jakarta', 900000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(6, 3, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(6, 2, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 00:22:11'),
 (7, 3, 'Virtual Assistant', 'Bantu admin dan koordinasi meeting', NULL, 'Surabaya', 600000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(8, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19');
+(8, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(25, 1, 'Detail celaning Mobil', 'Cuci Detail', 'lowongan/7A3IcB0rP11FrrITNeaUnFSYpHFyir14kgpU3kPZ.png', 'Cimahi', 600000.00, 'tidak_aktif', '2026-02-05 01:05:41', '2026-02-05 01:10:17');
 
 -- --------------------------------------------------------
 
@@ -312,6 +327,14 @@ CREATE TABLE `lowongan_kategori` (
   `idLowongan` int(11) NOT NULL,
   `id_kategori` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `lowongan_kategori`
+--
+
+INSERT INTO `lowongan_kategori` (`id`, `idLowongan`, `id_kategori`) VALUES
+(2, 2, 1),
+(1, 25, 1);
 
 -- --------------------------------------------------------
 
@@ -347,7 +370,15 @@ CREATE TABLE `notifikasi` (
 INSERT INTO `notifikasi` (`id_notifikasi`, `idUser`, `tipe_notifikasi`, `pesan`, `is_read`, `created_at`) VALUES
 (1, 2, 'rating', 'Anda menerima rating <strong>5 bintang</strong> dari John Doe untuk pekerjaan <strong>Developer Backend PHP</strong>', 0, '2026-02-05 05:22:45'),
 (2, 4, 'rating', 'Anda menerima rating <strong>4 bintang</strong> dari Ahmad Rizki untuk pekerjaan <strong>Content Writer Profesional</strong>', 0, '2026-02-05 05:22:45'),
-(3, 5, 'rating', 'Anda menerima rating <strong>5 bintang</strong> dari John Doe untuk pekerjaan <strong>Developer Backend PHP</strong>', 0, '2026-02-05 05:22:45');
+(3, 5, 'rating', 'Anda menerima rating <strong>5 bintang</strong> dari John Doe untuk pekerjaan <strong>Developer Backend PHP</strong>', 0, '2026-02-05 05:22:45'),
+(4, 2, 'terima_lamaran', 'Selamat! Lamaran Anda untuk <strong>Detail celaning Mobil</strong> di <strong>John Doe</strong> telah diterima. <br><a href=\'http://127.0.0.1:8000/pekerja/lowongan/25\' class=\'text-pelagic-blue font-bold hover:underline mt-1 inline-block\'>Lihat Detail</a>', 0, '2026-02-05 01:10:17'),
+(5, 2, 'info', 'Pekerjaan \'<strong>Detail celaning Mobil</strong>\' telah dikonfirmasi selesai. Anda mendapatkan rating!', 0, '2026-02-05 01:10:40'),
+(6, 2, 'rating', 'Anda menerima rating <strong>4 bintang</strong> dari pemberi kerja untuk pekerjaan \'<strong>Detail celaning Mobil</strong>\'.', 0, '2026-02-05 01:14:44'),
+(7, 1, 'rating_dikirim', 'Rating Anda untuk \'<strong>Detail celaning Mobil</strong>\' telah terkirim kepada pekerja. Anda tidak dapat mengubah rating ini lagi.', 0, '2026-02-05 01:14:44'),
+(8, 5, 'terima_lamaran', 'Selamat! Lamaran Anda untuk <strong>UI/UX Designer</strong> di <strong>John Doe</strong> telah diterima. <br><a href=\'http://127.0.0.1:8000/pekerja/lowongan/2\' class=\'text-pelagic-blue font-bold hover:underline mt-1 inline-block\'>Lihat Detail</a>', 0, '2026-02-05 01:31:35'),
+(9, 5, 'info', 'Pekerjaan \'<strong>UI/UX Designer</strong>\' telah dikonfirmasi selesai. Anda mendapatkan rating!', 0, '2026-02-05 01:38:25'),
+(10, 5, 'rating', 'Anda menerima rating <strong>5 bintang</strong> dari pemberi kerja untuk pekerjaan \'<strong>UI/UX Designer</strong>\'.', 0, '2026-02-05 01:38:53'),
+(11, 1, 'rating_dikirim', 'Rating Anda untuk \'<strong>UI/UX Designer</strong>\' telah terkirim kepada pekerja. Anda tidak dapat mengubah rating ini lagi.', 0, '2026-02-05 01:38:53');
 
 -- --------------------------------------------------------
 
@@ -399,7 +430,11 @@ CREATE TABLE `pekerjaan` (
 INSERT INTO `pekerjaan` (`idPekerjaan`, `idLamaran`, `status_pekerjaan`, `tanggal_mulai`, `tanggal_selesai`, `created_at`, `updated_at`) VALUES
 (1, 1, 'selesai', '2026-01-01', '2026-01-15', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
 (2, 4, 'selesai', '2026-01-05', '2026-01-20', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(3, 6, 'selesai', '2026-01-10', '2026-01-25', '2026-02-05 05:22:45', '2026-02-05 05:22:45');
+(3, 6, 'selesai', '2026-01-10', '2026-01-25', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(4, 13, 'berjalan', '2026-02-05', NULL, '2026-02-05 01:10:17', '2026-02-05 01:10:17'),
+(5, 13, 'selesai', '2026-02-05', '2026-02-05', '2026-02-05 01:10:17', '2026-02-05 01:14:44'),
+(6, 14, 'berjalan', '2026-02-05', NULL, '2026-02-05 01:31:35', '2026-02-05 01:31:35'),
+(7, 14, 'selesai', '2026-02-05', '2026-02-05', '2026-02-05 01:31:35', '2026-02-05 01:38:53');
 
 -- --------------------------------------------------------
 
@@ -423,7 +458,7 @@ CREATE TABLE `pemberikerja` (
 
 INSERT INTO `pemberikerja` (`idPemberiKerja`, `idUser`, `nama_perusahaan`, `alamat`, `no_telp`, `created_at`, `updated_at`) VALUES
 (1, 1, 'PT Maju Jaya', 'Jl. Dipati Ukur No. 123, Bandung', '022-12345678', '2026-02-01 07:01:14', '2026-02-01 07:01:15'),
-(2, 3, 'CV Sejahtera', 'Jl. Dago No. 45, Bandung', '022-87654321', '2026-02-01 07:01:14', '2026-02-01 07:01:15'),
+(2, 3, 'CV Sejahtera', 'Jl. Dago No. 45, Bandung', '022-87654321', '2026-02-01 07:01:14', '2026-02-05 00:49:05'),
 (3, 6, 'Pramudya', NULL, NULL, '2026-02-03 05:57:09', '2026-02-03 05:57:09');
 
 -- --------------------------------------------------------
@@ -462,7 +497,9 @@ CREATE TABLE `rating` (
 INSERT INTO `rating` (`idRating`, `idPekerjaan`, `nilai_rating`, `ulasan`, `pemberi_rating`, `created_at`) VALUES
 (1, 1, 5, 'Developer sangat profesional, hasil kode rapi dan tepat waktu. Sangat puas!', 'PemberiKerja', '2026-02-05 05:22:45'),
 (2, 2, 4, 'Konten berkualitas, namun perlu waktu sedikit lebih lama. Overall bagus!', 'PemberiKerja', '2026-02-05 05:22:45'),
-(3, 3, 5, 'Pekerja sangat responsif dan detail oriented. Hasil excellent!', 'PemberiKerja', '2026-02-05 05:22:45');
+(3, 3, 5, 'Pekerja sangat responsif dan detail oriented. Hasil excellent!', 'PemberiKerja', '2026-02-05 05:22:45'),
+(4, 5, 4, 'bagus\n\n[Detail Penilaian]\nKualitas: 4/5\nWaktu: 4/5\nKomunikasi: 5/5\nInisiatif: 4/5\n\nBersedia bekerja lagi: Tidak Yakin', 'PemberiKerja', '2026-02-05 01:14:44'),
+(5, 7, 5, 'kerja bagus\n\n[Detail Penilaian]\nKualitas: 4/5\nWaktu: 4/5\nKomunikasi: 4/5\nInisiatif: 5/5', 'PemberiKerja', '2026-02-05 01:38:53');
 
 -- --------------------------------------------------------
 
@@ -494,7 +531,7 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`idUser`, `nama`, `username`, `email`, `password`, `jenis_kelamin`, `tipe_user`, `alamat`, `no_hp`, `foto_profil`, `remember_token`, `peran_old`, `created_at`, `updated_at`) VALUES
 (1, 'John Doe', 'john_doe', 'john.pemberi@email.com', '$2y$12$s.wK4Ut4TGXPfa5otQ37gOVqFNTLnGdyJ4jMIpH9xcnIvu3fEDTr.', 'Laki-laki', 'PemberiKerja', NULL, NULL, NULL, NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-01 21:01:17'),
 (2, 'Jane Smith', 'jane_smith', 'jane.pekerja@email.com', '$2y$12$UIi.uxHWSy2iVuLCYIW9vuVUo2zXfpVUKHWk13sf7q4Rd/z51Dhoa', 'Laki-laki', 'Pekerja', NULL, NULL, 'profil/profil_2_1770260626.png', NULL, 'Pekerja', '2026-02-01 07:01:14', '2026-02-04 22:02:32'),
-(3, 'Ahmad Rizki', 'ahmad_rizki', 'ahmad@email.com', '$2y$12$BZ/SCledyeW7U1XVj9/QLO5f0jdK0Ntp/LYfjUhHmqicILOayWjyq', 'Laki-laki', 'PemberiKerja', NULL, NULL, NULL, NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-04 20:43:35'),
+(3, 'Ahmad Rizki', 'ahmad_rizki', 'ahmad@email.com', '$2y$12$BZ/SCledyeW7U1XVj9/QLO5f0jdK0Ntp/LYfjUhHmqicILOayWjyq', 'Laki-laki', 'PemberiKerja', NULL, NULL, 'profil/profil_3_1770277745.png', NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-05 00:49:05'),
 (4, 'Siti Nurhaliza', 'siti_nurhaliza', 'siti@email.com', '$2y$12$YIUj9NxUQymROmU8xdhIy.i9CPPPcYHAob/LvcpvoQJlU26LZCVJ6', 'Laki-laki', 'Pekerja', NULL, NULL, NULL, NULL, 'Pekerja', '2026-02-01 07:01:14', '2026-02-01 21:05:30'),
 (5, 'Bhadriko Theo Pramudya', 'Bhadriko', 'bhadriko7@gmail.com', '$2y$12$C21P3T97IEoV2Knl2G0UzekHjx7/H6w4nxMW6HV0B833UJUJh2cBK', 'Laki-laki', 'Pekerja', 'Jln Batukali no 33', '085759412258', 'profil/profil_5_1770269999.png', NULL, NULL, '2026-02-02 22:17:24', '2026-02-04 22:39:59'),
 (6, 'Pramudya', 'bayangan_gwehhh', 'bhariko7@gmail.com', '$2y$12$UOVf1RJHsHxnaUYQIcces.1Z8Ckgm1RirK2hfLkbPLzcVaUeVjjHa', 'Laki-laki', 'PemberiKerja', 'Jalan jalan', '085759412258', NULL, NULL, NULL, '2026-02-02 22:57:09', '2026-02-02 22:57:09');
@@ -771,7 +808,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT untuk tabel `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT untuk tabel `chat_conversation`
@@ -801,19 +838,19 @@ ALTER TABLE `kategori`
 -- AUTO_INCREMENT untuk tabel `lamaran`
 --
 ALTER TABLE `lamaran`
-  MODIFY `idLamaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `idLamaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT untuk tabel `lowongan`
 --
 ALTER TABLE `lowongan`
-  MODIFY `idLowongan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `idLowongan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT untuk tabel `lowongan_kategori`
 --
 ALTER TABLE `lowongan_kategori`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT untuk tabel `migrations`
@@ -825,7 +862,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT untuk tabel `notifikasi`
 --
 ALTER TABLE `notifikasi`
-  MODIFY `id_notifikasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_notifikasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT untuk tabel `pekerja`
@@ -837,7 +874,7 @@ ALTER TABLE `pekerja`
 -- AUTO_INCREMENT untuk tabel `pekerjaan`
 --
 ALTER TABLE `pekerjaan`
-  MODIFY `idPekerjaan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idPekerjaan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT untuk tabel `pemberikerja`
@@ -855,7 +892,7 @@ ALTER TABLE `pencarian_log`
 -- AUTO_INCREMENT untuk tabel `rating`
 --
 ALTER TABLE `rating`
-  MODIFY `idRating` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idRating` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `user`

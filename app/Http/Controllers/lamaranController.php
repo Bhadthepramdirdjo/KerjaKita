@@ -55,12 +55,10 @@ class LamaranController extends Controller
             abort(403, 'Anda tidak memiliki akses ke lowongan ini');
         }
 
-        // Ambil daftar pelamar dengan detail profil
+        // Ambil daftar pelamar dengan detail profil dan rating
         $pelamar = DB::table('lamaran')
             ->join('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
             ->join('user', 'pekerja.idUser', '=', 'user.idUser')
-            ->leftJoin('pekerjaan', 'lamaran.idLamaran', '=', 'pekerjaan.idLamaran')
-            ->leftJoin('rating', 'pekerjaan.idPekerjaan', '=', 'rating.idPekerjaan')
             ->select(
                 'lamaran.*',
                 'user.nama',
@@ -69,26 +67,22 @@ class LamaranController extends Controller
                 'pekerja.pengalaman',
                 'pekerja.alamat',
                 'pekerja.no_telp',
-                DB::raw('COALESCE(AVG(rating.nilai_rating), 0) as rating_avg'),
-                DB::raw('COUNT(DISTINCT rating.idRating) as total_rating')
+                DB::raw('(
+                    SELECT COALESCE(AVG(r.nilai_rating), 0)
+                    FROM rating r
+                    INNER JOIN pekerjaan p ON r.idPekerjaan = p.idPekerjaan
+                    INNER JOIN lamaran l ON p.idLamaran = l.idLamaran
+                    WHERE l.idPekerja = pekerja.idPekerja
+                ) as rating_avg'),
+                DB::raw('(
+                    SELECT COUNT(DISTINCT r.idRating)
+                    FROM rating r
+                    INNER JOIN pekerjaan p ON r.idPekerjaan = p.idPekerjaan
+                    INNER JOIN lamaran l ON p.idLamaran = l.idLamaran
+                    WHERE l.idPekerja = pekerja.idPekerja
+                ) as total_rating')
             )
             ->where('lamaran.idLowongan', $id)
-            ->groupBy(
-                'lamaran.idLamaran',
-                'lamaran.idPekerja',
-                'lamaran.idLowongan',
-                'lamaran.status_lamaran',
-                'lamaran.tanggal_lamaran',
-                'lamaran.is_read',
-                'lamaran.created_at',
-                'lamaran.updated_at',
-                'user.nama',
-                'user.email',
-                'pekerja.keahlian',
-                'pekerja.pengalaman',
-                'pekerja.alamat',
-                'pekerja.no_telp'
-            )
             ->orderByRaw("
                 CASE 
                     WHEN lamaran.status_lamaran = 'pending' THEN 1

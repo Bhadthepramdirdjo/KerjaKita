@@ -99,6 +99,7 @@ class PemberiKerjaController extends Controller
                 'lowongan.lokasi',
                 'lowongan.idPemberiKerja',
                 DB::raw('NULL as idLamaran'),
+                DB::raw('NULL as idPekerja'),
                 DB::raw('"Belum ada pekerja" as nama_pekerja')
             )
             ->where('idPemberiKerja', $idPemberiKerja)
@@ -176,7 +177,26 @@ class PemberiKerjaController extends Controller
                 return $item;
             });
 
-        return view('pemberi-kerja.profil-pelamar', compact('pekerja', 'rating', 'totalRating', 'pengalamanKerja'));
+        // Ambil ulasan terbaru
+        $ulasanList = DB::table('rating')
+            ->join('pekerjaan', 'rating.idPekerjaan', '=', 'pekerjaan.idPekerjaan')
+            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+            ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+            ->join('user', 'PemberiKerja.idUser', '=', 'user.idUser')
+            ->where('lamaran.idPekerja', $pekerja->idPekerja)
+            ->where('rating.pemberi_rating', 'PemberiKerja')
+            ->select(
+                'rating.nilai_rating',
+                'rating.ulasan',
+                'rating.created_at',
+                'lowongan.judul as judul_pekerjaan',
+                'user.nama as nama_pemberi_kerja'
+            )
+            ->orderBy('rating.created_at', 'desc')
+            ->get();
+
+        return view('pemberi-kerja.profil-pelamar', compact('pekerja', 'rating', 'totalRating', 'pengalamanKerja', 'ulasanList'));
     }
     
     /**
@@ -206,7 +226,9 @@ class PemberiKerjaController extends Controller
             'deskripsi' => 'required|string',
             'lokasi' => 'required|string|max:255',
             'upah' => 'required',
-            'status' => 'required|in:aktif,draft'
+            'status' => 'required|in:aktif,draft',
+            'gambar' => 'nullable|array',
+            'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
         ]);
 
         $idPemberiKerja = $this->getIdPemberiKerja();
@@ -220,12 +242,35 @@ class PemberiKerjaController extends Controller
                 ->withErrors(['upah' => 'Upah harus berupa angka']);
         }
 
+        // Handle image upload
+        $gambarPath = null;
+        if ($request->hasFile('gambar') && count($request->file('gambar')) > 0) {
+            $files = $request->file('gambar');
+            $filePath = null;
+            
+            // Process first image only (store as gambar field in lowongan)
+            if (isset($files[0]) && $files[0]->isValid()) {
+                $file = $files[0];
+                
+                // Create folder if not exists
+                if (!\Illuminate\Support\Facades\Storage::disk('public')->exists('lowongan')) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('lowongan');
+                }
+                
+                // Store image
+                $fileName = 'lowongan_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('lowongan', $fileName, 'public');
+                $gambarPath = 'lowongan/' . $fileName;
+            }
+        }
+
         DB::table('lowongan')->insert([
             'idPemberiKerja' => $idPemberiKerja,
             'judul' => $validated['judul'],
             'deskripsi' => $validated['deskripsi'],
             'lokasi' => $validated['lokasi'],
             'upah' => (int) $upahValue,
+            'gambar' => $gambarPath,
             'status' => $validated['status'],
             'created_at' => now(),
             'updated_at' => now()
@@ -265,26 +310,17 @@ class PemberiKerjaController extends Controller
     // Query lowongan berdasarkan pemberi kerja
     $lowongan = DB::table('lowongan')
         ->where('idPemberiKerja', $idPemberiKerja)
-        ->leftJoin('lamaran', 'lowongan.idLowongan', '=', 'lamaran.idLowongan')
-        ->leftJoin('pekerjaan', 'lamaran.idLamaran', '=', 'pekerjaan.idLamaran')
-        ->leftJoin('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
-        ->leftJoin('user', 'pekerja.idUser', '=', 'user.idUser')
-        ->leftJoin('rating', function($join) {
-            $join->on('pekerjaan.idPekerjaan', '=', 'rating.idPekerjaan')
-                 ->where('rating.pemberi_rating', '=', 'PemberiKerja');
-        })
         ->select(
             'lowongan.idLowongan',
             'lowongan.judul',
             'lowongan.lokasi',
             'lowongan.status',
-            DB::raw('COUNT(lamaran.idLamaran) as total_pelamar'),
-            DB::raw('MAX(pekerjaan.status_pekerjaan) as status_pekerjaan'),
-            DB::raw('MAX(pekerjaan.idPekerjaan) as idPekerjaan'),
-            DB::raw('COUNT(rating.idRating) as is_rated'),
-            DB::raw('MAX(CASE WHEN pekerjaan.idPekerjaan IS NOT NULL THEN user.nama ELSE NULL END) as nama_pekerja')
+            DB::raw('(SELECT COUNT(DISTINCT l.idLamaran) FROM lamaran l WHERE l.idLowongan = lowongan.idLowongan) as total_pelamar'),
+            DB::raw('(SELECT MAX(p.status_pekerjaan) FROM pekerjaan p INNER JOIN lamaran l ON p.idLamaran = l.idLamaran WHERE l.idLowongan = lowongan.idLowongan) as status_pekerjaan'),
+            DB::raw('(SELECT MAX(p.idPekerjaan) FROM pekerjaan p INNER JOIN lamaran l ON p.idLamaran = l.idLamaran WHERE l.idLowongan = lowongan.idLowongan) as idPekerjaan'),
+            DB::raw('(SELECT COUNT(r.idRating) FROM rating r INNER JOIN pekerjaan p ON r.idPekerjaan = p.idPekerjaan INNER JOIN lamaran l ON p.idLamaran = l.idLamaran WHERE l.idLowongan = lowongan.idLowongan AND r.pemberi_rating = "PemberiKerja") as is_rated'),
+            DB::raw('(SELECT MAX(u.nama) FROM user u INNER JOIN pekerja pk ON u.idUser = pk.idUser INNER JOIN lamaran l ON pk.idPekerja = l.idPekerja INNER JOIN pekerjaan p ON l.idLamaran = p.idLamaran WHERE l.idLowongan = lowongan.idLowongan) as nama_pekerja')
         )
-        ->groupBy('lowongan.idLowongan', 'lowongan.judul', 'lowongan.lokasi', 'lowongan.status')
         ->orderBy('lowongan.created_at', 'desc')
         ->get();
 
@@ -456,23 +492,26 @@ class PemberiKerjaController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:user,email,' . $user->idUser . ',idUser',
             'nama_perusahaan' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'no_telp' => 'nullable|string|max:20',
-            'foto_profil' => 'nullable|image|max:2048'
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        // Update user data
-        DB::table('user')
-            ->where('idUser', $user->idUser)
-            ->update([
-                'nama' => $validated['nama'],
-                'email' => $validated['email'],
-                'foto_profil' => $user->foto_profil, // Will update separately if new file
-                'updated_at' => now()
-            ]);
+        // Handle profile picture upload
+        if ($request->hasFile('foto_profil')) {
+            $file = $request->file('foto_profil');
+            $fileName = 'profil_' . $user->idUser . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('profil', $fileName, 'public');
+            
+            // Update user with new foto path
+            DB::table('user')
+                ->where('idUser', $user->idUser)
+                ->update([
+                    'foto_profil' => 'profil/' . $fileName,
+                    'updated_at' => now()
+                ]);
+        }
 
         // Update pemberi kerja data
         DB::table('PemberiKerja')
@@ -483,17 +522,6 @@ class PemberiKerjaController extends Controller
                 'no_telp' => $validated['no_telp'],
                 'updated_at' => now()
             ]);
-
-        // Handle profile picture upload
-        if ($request->hasFile('foto_profil')) {
-            $file = $request->file('foto_profil');
-            $fileName = 'profil_' . $user->idUser . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('profil', $fileName, 'public');
-
-            DB::table('user')
-                ->where('idUser', $user->idUser)
-                ->update(['foto_profil' => 'profil/' . $fileName]);
-        }
 
         return redirect()->route('pemberi-kerja.profil')
             ->with('success', 'Profil berhasil diperbarui!');

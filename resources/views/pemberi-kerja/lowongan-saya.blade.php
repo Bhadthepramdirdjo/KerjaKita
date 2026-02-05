@@ -550,6 +550,8 @@
                 input = document.getElementById('input_' + type);
             }
             
+            if (!input) return; // Safety check
+            
             input.value = val;
             const stars = container.querySelectorAll('i');
             
@@ -558,9 +560,11 @@
                 if (starVal <= val) {
                     star.classList.remove('far', 'inactive');
                     star.classList.add('fas', 'active');
+                    star.style.color = '#FBBF24';
                 } else {
                     star.classList.remove('fas', 'active');
                     star.classList.add('far', 'inactive');
+                    star.style.color = '#D1D5DB';
                 }
             });
         }
@@ -570,8 +574,10 @@
             allStars.forEach(star => {
                 star.classList.remove('fas', 'active');
                 star.classList.add('far', 'inactive');
+                star.style.color = '#D1D5DB';
             });
-            document.querySelectorAll('input[type="hidden"]').forEach(i => i.value = '');
+            document.querySelectorAll('input[type="hidden"][name^="input"]').forEach(i => i.value = '');
+            document.querySelectorAll('input[type="hidden"][name="nilai_rating"]').forEach(i => i.value = '');
         }
     </script>
 </body>

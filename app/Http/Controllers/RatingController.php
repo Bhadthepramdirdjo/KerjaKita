@@ -19,11 +19,11 @@ class RatingController extends Controller
             'idPekerjaan' => 'required|integer',
             'nilai_rating' => 'required|integer|min:1|max:5',
             'ulasan' => 'nullable|string|max:500',
-            // Input tambahan detail
-            'kualitas' => 'nullable|integer|min:1|max:5',
-            'waktu' => 'nullable|integer|min:1|max:5',
-            'komunikasi' => 'nullable|integer|min:1|max:5',
-            'inisiatif' => 'nullable|integer|min:1|max:5',
+            // Input tambahan detail - semua optional
+            'kualitas' => 'nullable|integer|min:0|max:5',
+            'waktu' => 'nullable|integer|min:0|max:5',
+            'komunikasi' => 'nullable|integer|min:0|max:5',
+            'inisiatif' => 'nullable|integer|min:0|max:5',
             'bersedia_kembali' => 'nullable|string'
         ]);
 
@@ -65,19 +65,21 @@ class RatingController extends Controller
             // Gabungkan detail penilaian ke ulasan text
             $richUlasan = $validated['ulasan'] ?? '';
             // Append detail jika ada (seperti mockup)
-            if ($request->has('kualitas')) {
+            if ($request->has('kualitas') || $request->has('waktu') || $request->has('komunikasi') || $request->has('inisiatif')) {
                 $detailStr = [];
-                if($request->kualitas) $detailStr[] = "Kualitas: {$request->kualitas}/5";
-                if($request->waktu) $detailStr[] = "Waktu: {$request->waktu}/5";
-                if($request->komunikasi) $detailStr[] = "Komunikasi: {$request->komunikasi}/5";
-                if($request->inisiatif) $detailStr[] = "Inisiatif: {$request->inisiatif}/5";
+                $kualitas = $request->input('kualitas');
+                $waktu = $request->input('waktu');
+                $komunikasi = $request->input('komunikasi');
+                $inisiatif = $request->input('inisiatif');
+                
+                if (!empty($kualitas) && $kualitas > 0) $detailStr[] = "Kualitas: {$kualitas}/5";
+                if (!empty($waktu) && $waktu > 0) $detailStr[] = "Waktu: {$waktu}/5";
+                if (!empty($komunikasi) && $komunikasi > 0) $detailStr[] = "Komunikasi: {$komunikasi}/5";
+                if (!empty($inisiatif) && $inisiatif > 0) $detailStr[] = "Inisiatif: {$inisiatif}/5";
                 
                 if (!empty($detailStr)) {
                     $richUlasan .= "\n\n[Detail Penilaian]\n" . implode("\n", $detailStr);
                 }
-            }
-            if ($request->has('bersedia_kembali')) {
-                $richUlasan .= "\n\nBersedia bekerja lagi: " . $request->bersedia_kembali;
             }
 
             // 4. Simpan rating

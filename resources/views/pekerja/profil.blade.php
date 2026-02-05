@@ -335,7 +335,13 @@
                         </div>
                         
                         <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-                            {{ $review->ulasan }}
+                            @php
+                                $ulasan = $review->ulasan;
+                                // Remove "Bersedia bekerja lagi" line
+                                $ulasan = preg_replace('/\n*Bersedia bekerja lagi:.*$/m', '', $ulasan);
+                                $ulasan = trim($ulasan);
+                            @endphp
+                            {{ $ulasan }}
                         </div>
                     </div>
                     @empty
