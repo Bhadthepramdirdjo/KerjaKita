@@ -160,7 +160,8 @@ class LowonganController extends Controller
             'lokasi' => 'required|string|max:255',
             'upah' => 'required|numeric|min:0',
             'kategori' => 'required', // Bisa ID atau string ID
-            'status' => 'required|in:aktif,draft,selesai'
+            'status' => 'required|in:aktif,draft,selesai',
+            'gambar' => 'nullable|image|max:2048'
         ]);
 
         DB::table('lowongan')
@@ -174,6 +175,21 @@ class LowonganController extends Controller
                 'status' => $validated['status'],
                 'updated_at' => now()
             ]);
+
+        // Handle Gambar Update/Delete
+        if ($request->input('delete_image') == '1') {
+            // Hapus gambar lama jika ada
+            if ($lowongan->gambar) {
+                // Optional: Delete physical file if needed using Storage::delete
+                // Storage::disk('public')->delete($lowongan->gambar); 
+            }
+            DB::table('lowongan')->where('idLowongan', $id)->update(['gambar' => null]);
+        } 
+        
+        if ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('lowongan', 'public');
+            DB::table('lowongan')->where('idLowongan', $id)->update(['gambar' => $path]);
+        }
 
         // Update kategori di tabel relasi
         $exists_kat = DB::table('lowongan_kategori')->where('idLowongan', $id)->exists();

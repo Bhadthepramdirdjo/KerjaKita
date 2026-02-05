@@ -44,6 +44,8 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('pemberi-kerja')->name('pemberi-kerja.')->middleware('pemberi_kerja')->group(function () {
         Route::get('/dashboard', [PemberiKerjaController::class, 'dashboard'])->name('dashboard');
         Route::get('/pengaturan', [PemberiKerjaController::class, 'pengaturan'])->name('pengaturan');
+        Route::get('/profil', [PemberiKerjaController::class, 'profil'])->name('profil');
+        Route::put('/profil', [PemberiKerjaController::class, 'updateProfil'])->name('profil.update');
         Route::get('/buat-lowongan', [PemberiKerjaController::class, 'buatLowongan'])->name('buat-lowongan');
         Route::post('/simpan-lowongan', [PemberiKerjaController::class, 'simpanLowongan'])->name('simpan-lowongan');
         Route::get('/rekomendasi-pekerja', [PemberiKerjaController::class, 'rekomendasiPekerja'])->name('rekomendasi-pekerja');

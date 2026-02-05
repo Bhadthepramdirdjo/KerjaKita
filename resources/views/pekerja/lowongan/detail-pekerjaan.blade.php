@@ -182,9 +182,10 @@
                             <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-3">Gambar Pekerjaan</span>
                             
                             @php
-                                // Untuk sementara, karena belum ada kolom gambar di database
-                                // Nanti bisa diganti dengan data dari database
-                                $gambar = []; // Array kosong, nanti isi dari database
+                                $gambar = [];
+                                if (isset($lowongan->gambar) && $lowongan->gambar) {
+                                    $gambar[] = asset('storage/' . $lowongan->gambar);
+                                }
                             @endphp
                             
                             @if(count($gambar) > 0)
