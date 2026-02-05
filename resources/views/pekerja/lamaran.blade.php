@@ -67,32 +67,39 @@
 <body class="text-keel-black h-screen flex overflow-hidden">
     
     <!-- Sidebar -->
-    <aside class="w-20 lg:w-24 h-screen flex flex-col items-center py-8 z-50 fixed left-0 top-0 bg-white border-r border-gray-200 shadow-sm">
-        <!-- Settings Icon -->
-        <div class="mb-auto">
-             <a href="{{ route('pekerja.pengaturan') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-cog text-2xl"></i>
-            </a>
-        </div>
-        
-        <!-- Center Icons -->
-        <div class="flex flex-col space-y-8">
-            <a href="{{ route('pekerja.dashboard') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-home text-xl"></i>
+    <!-- Speed Dial Navigation -->
+    <div id="speed-dial-container" class="fixed top-6 left-6 z-50 flex flex-col items-center gap-4">
+        <!-- Trigger Button (Logo) -->
+        <button id="speed-dial-trigger" class="w-16 h-16 rounded-full bg-white shadow-xl border border-gray-100 flex items-center justify-center relative z-20 transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none">
+             <img src="{{ asset('images/LOGO.png') }}" alt="Menu" class="w-10 h-10 object-contain">
+        </button>
+
+        <!-- Menu Items -->
+        <div id="speed-dial-menu" class="flex flex-col gap-3 items-center opacity-0 -translate-y-4 scale-90 pointer-events-none transition-all duration-300 ease-out origin-top">
+            <!-- Dashboard -->
+            <a href="{{ route('pekerja.dashboard') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Dashboard">
+                <i class="fas fa-home text-lg"></i>
             </a>
             
-            <!-- Lamaran Saya Button (Active) -->
-            <button class="w-12 h-12 rounded-xl flex items-center justify-center bg-keel-black text-white shadow-lg transform scale-110">
-                <i class="fas fa-briefcase text-xl"></i>
-            </button>
+            <!-- Lamaran Saya -->
+            <a href="{{ route('pekerja.lamaran') }}" class="w-12 h-12 rounded-full bg-keel-black text-white shadow-lg flex items-center justify-center hover:bg-keel-black hover:text-white transition-all duration-200 transform hover:scale-110" title="Lamaran Saya">
+                <i class="fas fa-briefcase text-lg"></i>
+            </a>
+
+            <!-- Profil -->
+            <a href="{{ route('pekerja.profil') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Profil">
+                <i class="fas fa-user text-lg"></i>
+            </a>
+
+            <!-- Pengaturan -->
+            <a href="{{ route('pekerja.pengaturan') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Pengaturan">
+                <i class="fas fa-cog text-lg"></i>
+            </a>
         </div>
-        
-        <!-- Bottom Placeholder -->
-        <div class="mt-auto"></div>
-    </aside>
+    </div>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-20 lg:ml-24 overflow-y-auto">
+    <main class="flex-1 flex flex-col h-screen relative w-full">
         <div class="max-w-7xl mx-auto p-6 lg:p-8">
             
             <!-- Header -->
@@ -216,7 +223,50 @@
     </main>
 
     <script>
+        // Speed Dial Navigation Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('speed-dial-container');
+            const menu = document.getElementById('speed-dial-menu');
+            const trigger = document.getElementById('speed-dial-trigger');
+            let isLocked = false;
+
+            if (container && menu && trigger) {
+                function toggleMenu() {
+                    isLocked = !isLocked;
+                    if (isLocked) {
+                        menu.classList.remove('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        menu.classList.add('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        trigger.classList.add('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    } else {
+                        menu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        menu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        trigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    }
+                }
+
+                function closeMenu() {
+                    isLocked = false;
+                    menu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                    menu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                    trigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                }
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+
+                // Close if clicked outside
+                document.addEventListener('click', (e) => {
+                    if (isLocked && !container.contains(e.target)) {
+                        closeMenu();
+                    }
+                });
+            }
+        });
+
         function switchTab(tabName) {
+            // ... (rest of the existing function)
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');

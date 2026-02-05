@@ -69,46 +69,22 @@ class PemberiKerjaController extends Controller
                                 ->count(),
         ];
 
-        // Hitung pekerja yang menunggu konfirmasi (status diterima tapi belum ada pekerjaan)
-        $pekerjaMenunggu = DB::table('lamaran')
-            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-            ->leftJoin('pekerjaan', 'lamaran.idLamaran', '=', 'pekerjaan.idLamaran')
-            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
-            ->where('lamaran.status_lamaran', 'diterima')
-            ->whereNull('pekerjaan.idPekerjaan')
-            ->count();
-
-        // Hitung notifikasi Lamaran Baru (badge di sidebar)
-        $notifikasiLamaranBaru = DB::table('lamaran')
-            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
-            ->where('lamaran.is_read', false)
-            ->count();
+        // Ambil notifikasi untuk pemberi kerja
+        $idUser = Auth::id();
+        $notifikasi = DB::table('notifikasi')
+            ->where('idUser', $idUser)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
 
         // 2. Ambil Daftar Lowongan Aktif (untuk Slider)
-        // Tampilkan semua lowongan aktif + pekerjaan jika ada
         $pekerjaan = DB::table('lowongan')
-            ->select(
-                DB::raw('NULL as idPekerjaan'),
-                DB::raw('"aktif" as status_pekerjaan'),
-                DB::raw('NULL as tanggal_mulai'),
-                DB::raw('NULL as tanggal_selesai'),
-                'lowongan.idLowongan',
-                'lowongan.judul', 
-                'lowongan.upah', 
-                'lowongan.lokasi',
-                'lowongan.idPemberiKerja',
-                DB::raw('NULL as idLamaran'),
-                DB::raw('NULL as idPekerja'),
-                DB::raw('"Belum ada pekerja" as nama_pekerja')
-            )
             ->where('idPemberiKerja', $idPemberiKerja)
             ->where('status', 'aktif')
             ->orderBy('created_at', 'desc')
-            ->limit(5)
             ->get();
 
-        return view('pemberi-kerja.dashboard', compact('stats', 'pekerjaan', 'pekerjaMenunggu', 'notifikasiLamaranBaru'));
+        return view('pemberi-kerja.dashboard', compact('stats', 'pekerjaan', 'notifikasi'));
     }
 
     /**

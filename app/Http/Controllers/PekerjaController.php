@@ -69,7 +69,25 @@ class PekerjaController extends Controller
             abort(404, 'Lowongan tidak ditemukan');
         }
         
-        return view('pekerja.lowongan.detail-pekerjaan', compact('lowongan'));
+        // Cek apakah user sudah melamar
+        $sudahMelamar = false;
+        if (auth()->check() && auth()->user()->tipe_user === 'Pekerja') {
+            $idUser = auth()->user()->idUser;
+            $pekerja = DB::table('pekerja')->where('idUser', $idUser)->first();
+            
+            if ($pekerja) {
+                $cekLamaran = DB::table('lamaran')
+                    ->where('idLowongan', $id)
+                    ->where('idPekerja', $pekerja->idPekerja)
+                    ->exists();
+                
+                if ($cekLamaran) {
+                    $sudahMelamar = true;
+                }
+            }
+        }
+        
+        return view('pekerja.lowongan.detail-pekerjaan', compact('lowongan', 'sudahMelamar'));
     }
     
     /**

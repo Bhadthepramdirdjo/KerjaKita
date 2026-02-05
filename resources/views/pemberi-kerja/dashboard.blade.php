@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Pemberi Kerja - KerjaKita</title>
     
     <!-- Favicon -->
@@ -118,46 +119,64 @@
         .arrow-btn:active:not([style*="pointer-events: none"]) {
             transform: scale(0.95);
         }
+
+        /* Notifikasi Dropdown Animation */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-dropdown {
+            animation: slideDown 0.3s ease-out;
+        }
     </style>
 </head>
 <body class="text-keel-black h-screen flex overflow-hidden">
 
-    <!-- Sidebar (Floating Style) -->
-    <aside class="w-20 lg:w-24 h-screen flex flex-col items-center py-8 z-50 fixed left-0 top-0 bg-white border-r border-gray-200 shadow-sm">
-        <div class="mb-auto">
-             <a href="{{ route('pemberi-kerja.pengaturan') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-cog text-2xl"></i>
+    <!-- Speed Dial Navigation -->
+    <div id="speed-dial-container" class="fixed top-6 left-6 z-50 flex flex-col items-center gap-4">
+        <!-- Trigger Button (Logo) -->
+        <button id="speed-dial-trigger" class="w-16 h-16 rounded-full bg-white shadow-xl border border-gray-100 flex items-center justify-center relative z-20 transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none">
+             <img src="{{ asset('images/LOGO.png') }}" alt="Menu" class="w-10 h-10 object-contain">
+        </button>
+
+        <!-- Menu Items -->
+        <div id="speed-dial-menu" class="flex flex-col gap-3 items-center opacity-0 -translate-y-4 scale-90 pointer-events-none transition-all duration-300 ease-out origin-top">
+            <!-- Dashboard -->
+            <a href="{{ route('pemberi-kerja.dashboard') }}" class="w-12 h-12 rounded-full bg-keel-black text-white shadow-lg flex items-center justify-center hover:bg-keel-black hover:text-white transition-all duration-200 transform hover:scale-110" title="Dashboard">
+                <i class="fas fa-home text-lg"></i>
+            </a>
+            
+            <!-- Lowongan Saya -->
+            <a href="{{ route('pemberi-kerja.lowongan-saya') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Lowongan Saya">
+                <i class="fas fa-briefcase text-lg"></i>
+            </a>
+
+            <!-- Profil -->
+            <a href="{{ route('pemberi-kerja.profil') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Profil">
+                <i class="fas fa-user text-lg"></i>
+            </a>
+
+            <!-- Pengaturan -->
+            <a href="{{ route('pemberi-kerja.pengaturan') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Pengaturan">
+                <i class="fas fa-cog text-lg"></i>
             </a>
         </div>
-        <div class="flex flex-col space-y-8">
-            <button class="w-12 h-12 rounded-xl flex items-center justify-center bg-keel-black text-white shadow-lg transform scale-110">
-                <i class="fas fa-home text-xl"></i>
-            </button>
-            <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>
-            <a href="{{ route('pemberi-kerja.lowongan-saya') }}" class="relative w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-briefcase text-2xl"></i>
-                @if(isset($notifikasiLamaranBaru) && $notifikasiLamaranBaru > 0)
-                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">{{ $notifikasiLamaranBaru }}</span>
-                @endif
-            </a>
-        </div>
-        <div class="mt-auto"></div>
-    </aside>
+    </div>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-20 lg:ml-24 flex flex-col h-screen relative">
+    <main class="flex-1 flex flex-col h-screen relative w-full">
         
         <!-- Header Section -->
         <header class="w-full px-6 py-6 flex items-center gap-4">
-            <!-- Logo Icon -->
-            <div class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100 flex-shrink-0 p-1.5">
-                <img src="{{ asset('images/LOGO.png') }}" alt="KerjaKita Logo" class="w-full h-full object-contain">
-            </div>
-
             <!-- Search Bar -->
-            <div class="flex-1 relative">
+            <div class="flex-1 relative ml-20">
                 <input type="text" placeholder="Cari..." class="w-full bg-white border-2 border-keel-black rounded-full py-2 px-6 focus:outline-none focus:ring-2 focus:ring-pelagic-blue shadow-sm">
                 <button class="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center">
                     <i class="fas fa-search text-keel-black"></i>
@@ -173,6 +192,38 @@
             <a href="{{ route('pemberi-kerja.buat-lowongan') }}" class="md:hidden w-10 h-10 rounded-full bg-keel-black text-white flex items-center justify-center hover:bg-gray-800">
                 <i class="fas fa-plus"></i>
             </a>
+
+            <!-- Notifikasi Bell -->
+            <div class="relative">
+                <button id="notificationBtn" class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center bg-white hover:bg-gray-50 flex-shrink-0">
+                    <i class="fas fa-bell text-2xl text-keel-black"></i>
+                    @php
+                        $unreadCount = $notifikasi->where('is_read', 0)->count();
+                    @endphp
+                    @if($unreadCount > 0)
+                        <!-- Dot Style Indicator -->
+                        <span class="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                    @endif
+                </button>
+
+                <!-- Notification Dropdown -->
+                <div id="notificationDropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 hidden notification-dropdown">
+                    <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="font-bold text-lg text-keel-black">Notifikasi</h3>
+                        <button id="clearAllBtn" class="bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-500 text-xs px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5">
+                            <i class="fas fa-trash-alt"></i>
+                            Hapus Semua
+                        </button>
+                    </div>
+                    <div id="notificationList" class="max-h-80 overflow-y-auto">
+                        <!-- Notifications will be loaded here by JS -->
+                        <div class="p-4 text-gray-500 text-center">Memuat notifikasi...</div>
+                    </div>
+                    <div class="p-4 border-t border-gray-200 text-center">
+                        <a href="#" class="text-pelagic-blue hover:text-abyss-teal text-sm font-semibold">Lihat Semua Notifikasi</a>
+                    </div>
+                </div>
+            </div>
 
             <!-- Profile Icon -->
             <a href="{{ route('pemberi-kerja.profil') }}" class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
@@ -255,8 +306,8 @@
                             <div>
                                 <span class="block text-xs font-bold text-gray-500 mb-0.5">Pekerja :</span>
                                 <div class="font-bold text-gray-800 flex items-center gap-2">
-                                     {{ $job->nama_pekerja }}
-                                    @if($job->idPekerja)
+                                     {{ $job->nama_pekerja ?? 'Belum ada pekerja' }}
+                                    @if(isset($job->idPekerja) && $job->idPekerja)
                                         <a href="{{ route('pekerja.profil.publik', $job->idPekerja) }}" target="_blank" class="ml-auto text-pelagic-blue hover:text-abyss-teal transition-colors">
                                             <i class="fas fa-external-link-alt"></i>
                                         </a>
@@ -270,7 +321,7 @@
                     <div class="bg-keel-black px-8 py-6 relative flex items-center">
                         <!-- Buttons Container (Left Aligned & Limited Width) -->
                         <div class="w-3/4 space-y-3 z-10 flex flex-col items-start">
-                            @if($job->idPekerjaan)
+                            @if(isset($job->idPekerjaan) && $job->idPekerjaan)
                                 <!-- Jika ada pekerjaan -->
                                 @if($job->status_pekerjaan == 'berjalan')
                                     <!-- Jika masih berjalan, tampilkan tombol lihat pelamar dan konfirmasi selesai -->
@@ -334,6 +385,11 @@
     </main>
 
     <script>
+
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
         const container = document.getElementById('cardContainer');
         const nextBtn = document.getElementById('scrollRight');
         const prevBtn = document.getElementById('scrollLeft');
@@ -540,5 +596,168 @@
         </div>
     </div>
 
+    <script>
+        // Notification Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const notificationBtn = document.getElementById('notificationBtn');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationList = document.getElementById('notificationList');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            // Store notifications in a variable we can update
+            let notificationsData = @json($notifikasi);
+
+            // Clear All Notifications
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    fetch('{{ route("notifikasi.deleteAll") }}', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.success) {
+                                // Update local data
+                                notificationsData = [];
+                                
+                                // Update UI
+                                renderNotifications();
+                                
+                                const badge = notificationBtn.querySelector('span.absolute');
+                                if (badge) badge.remove();
+                            }
+                        })
+                        .catch(console.error);
+                });
+            }
+            
+            // Toggle Dropdown
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isClosed = notificationDropdown.classList.contains('hidden');
+                    
+                    // Close other dropdowns if any (optional)
+                    
+                    notificationDropdown.classList.toggle('hidden');
+                    
+                    if (isClosed) {
+                        // 1. Hide Badge Visually
+                        const badge = this.querySelector('span.absolute');
+                        if (badge) {
+                             badge.style.display = 'none';
+                        }
+
+                        // 2. Mark as read in backend
+                        fetch('{{ route("notifikasi.markRead") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                        }).catch(console.error);
+
+                        // 3. Render Notifications locally
+                        renderNotifications();
+                    }
+                });
+            }
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (notificationDropdown && !notificationDropdown.classList.contains('hidden')) {
+                    if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                        notificationDropdown.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Render function
+            function renderNotifications() {
+                if (notificationsData.length === 0) {
+                    notificationList.innerHTML = `
+                        <div class="p-8 text-center text-gray-500">
+                            <i class="fas fa-bell-slash text-2xl mb-2 text-gray-300"></i>
+                            <p class="text-sm">Tidak ada notifikasi baru</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                notificationsData.forEach(notif => {
+                    let iconClass = 'fa-bell text-pelagic-blue bg-blue-100';
+                    let title = 'Pemberitahuan';
+                    
+                    if (notif.tipe_notifikasi === 'lamaran_baru') {
+                        iconClass = 'fa-file-alt text-green-600 bg-green-100';
+                        title = 'Lamaran Baru';
+                    }
+
+                    html += `
+                        <div class="p-4 border-b border-gray-100 hover:bg-gray-50 flex gap-3 items-start">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${iconClass.split(' ').slice(1).join(' ')}">
+                                <i class="fas ${iconClass.split(' ')[0]}"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-sm text-keel-black">${title}</h4>
+                                <p class="text-xs text-gray-600 mt-1 line-clamp-2">${notif.pesan}</p>
+                                <span class="text-[10px] text-gray-400 mt-1 block">${new Date(notif.created_at).toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                notificationList.innerHTML = html;
+            }
+        });
+
+        // Speed Dial Navigation Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('speed-dial-container');
+            const menu = document.getElementById('speed-dial-menu');
+            const trigger = document.getElementById('speed-dial-trigger');
+            let isLocked = false;
+
+            if (container && menu && trigger) {
+                function toggleMenu() {
+                    isLocked = !isLocked;
+                    if (isLocked) {
+                        menu.classList.remove('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        menu.classList.add('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        trigger.classList.add('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    } else {
+                        menu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        menu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        trigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    }
+                }
+
+                function closeMenu() {
+                    isLocked = false;
+                    menu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                    menu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                    trigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                }
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+
+                // Close if clicked outside
+                document.addEventListener('click', (e) => {
+                    if (isLocked && !container.contains(e.target)) {
+                        closeMenu();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

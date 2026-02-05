@@ -9,6 +9,7 @@ use App\Http\Controllers\LowonganController;
 use App\Http\Controllers\LamaranController;
 use App\Http\Controllers\PekerjaanController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\NotifikasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,4 +96,8 @@ Route::middleware(['auth'])->group(function () {
     // FITUR 8: Rating Routes (untuk kedua pihak)
     Route::post('/rating/beri', [RatingController::class, 'beriRating'])->name('rating.beri');
     Route::get('/rating', [RatingController::class, 'index'])->name('rating.index');
+
+    // Notifikasi Routes
+    Route::post('/notifikasi/mark-read', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.markRead');
+    Route::delete('/notifikasi/delete-all', [NotifikasiController::class, 'deleteAll'])->name('notifikasi.deleteAll');
 });

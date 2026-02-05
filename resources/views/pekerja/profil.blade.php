@@ -33,39 +33,43 @@
 </head>
 <body class="text-keel-black h-screen flex overflow-hidden">
     
-    <!-- Sidebar -->
-    <aside class="w-20 lg:w-24 h-screen flex flex-col items-center py-8 z-50 fixed left-0 top-0 bg-white border-r border-gray-200 shadow-sm">
-        <!-- Settings Icon -->
-        <div class="mb-auto">
-             <a href="{{ route('pekerja.pengaturan') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-cog text-2xl"></i>
-            </a>
-        </div>
-        
-        <!-- Center Icons -->
-        <div class="flex flex-col space-y-8">
-            <a href="{{ route('pekerja.dashboard') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-home text-xl"></i>
+    <!-- Speed Dial Navigation -->
+    <div id="speed-dial-container" class="fixed top-6 left-6 z-50 flex flex-col items-center gap-4">
+        <!-- Trigger Button (Logo) -->
+        <button id="speed-dial-trigger" class="w-16 h-16 rounded-full bg-white shadow-xl border border-gray-100 flex items-center justify-center relative z-20 transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none">
+             <img src="{{ asset('images/LOGO.png') }}" alt="Menu" class="w-10 h-10 object-contain">
+        </button>
+
+        <!-- Menu Items -->
+        <div id="speed-dial-menu" class="flex flex-col gap-3 items-center opacity-0 -translate-y-4 scale-90 pointer-events-none transition-all duration-300 ease-out origin-top">
+            <!-- Dashboard -->
+            <a href="{{ route('pekerja.dashboard') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Dashboard">
+                <i class="fas fa-home text-lg"></i>
             </a>
             
-            <a href="{{ route('pekerja.lamaran') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-briefcase text-2xl"></i>
+            <!-- Lamaran Saya -->
+            <a href="{{ route('pekerja.lamaran') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Lamaran Saya">
+                <i class="fas fa-briefcase text-lg"></i>
+            </a>
+
+            <!-- Profil (Active) -->
+            <a href="{{ route('pekerja.profil') }}" class="w-12 h-12 rounded-full bg-keel-black text-white shadow-lg flex items-center justify-center hover:bg-keel-black hover:text-white transition-all duration-200 transform hover:scale-110" title="Profil">
+                <i class="fas fa-user text-lg"></i>
+            </a>
+
+            <!-- Pengaturan -->
+            <a href="{{ route('pekerja.pengaturan') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Pengaturan">
+                <i class="fas fa-cog text-lg"></i>
             </a>
         </div>
-        
-        <!-- Bottom Placeholder -->
-        <div class="mt-auto"></div>
-    </aside>
+    </div>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-20 lg:ml-24 overflow-y-auto">
+    <main class="flex-1 w-full flex flex-col h-screen relative overflow-y-auto">
         <div class="max-w-6xl mx-auto p-6 lg:p-8">
             
             <!-- Header with Back Button -->
-            <div class="mb-8 flex items-center gap-4">
-                <a href="{{ route('pekerja.dashboard') }}" class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100">
-                    <i class="fas fa-arrow-left text-keel-black"></i>
-                </a>
+            <div class="mb-8 flex items-center gap-4 ml-20">
                 <h1 class="text-3xl font-bold text-keel-black">Profil Pekerja</h1>
             </div>
 
@@ -492,5 +496,48 @@
         }
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Speed Dial Navigation ---
+            const dialContainer = document.getElementById('speed-dial-container');
+            const dialMenu = document.getElementById('speed-dial-menu');
+            const dialTrigger = document.getElementById('speed-dial-trigger');
+            let isDialLocked = false;
+
+            if (dialContainer && dialMenu && dialTrigger) {
+                function toggleDial() {
+                    isDialLocked = !isDialLocked;
+                    if (isDialLocked) {
+                        dialMenu.classList.remove('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        dialMenu.classList.add('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        dialTrigger.classList.add('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    } else {
+                        dialMenu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        dialMenu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        dialTrigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    }
+                }
+
+                function closeDial() {
+                    isDialLocked = false;
+                    dialMenu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                    dialMenu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                    dialTrigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                }
+
+                dialTrigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDial();
+                });
+
+                // Global click to close
+                document.addEventListener('click', function(e) {
+                    if (isDialLocked && !dialContainer.contains(e.target)) {
+                        closeDial();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
