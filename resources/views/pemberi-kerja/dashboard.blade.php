@@ -175,7 +175,7 @@
             </a>
 
             <!-- Profile Icon -->
-            <a href="{{ route('pemberi-kerja.pengaturan') }}" class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
+            <a href="{{ route('pemberi-kerja.profil') }}" class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
                 @if(auth()->user()->foto_profil)
                     <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="Foto Profil" class="w-full h-full object-cover">
                 @else

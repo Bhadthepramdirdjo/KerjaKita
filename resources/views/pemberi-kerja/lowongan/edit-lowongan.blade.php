@@ -102,6 +102,32 @@
                             <label class="block text-sm font-bold text-gray-700 mb-2">Lokasi Kerja</label>
                             <input type="text" name="lokasi" value="{{ old('lokasi', $lowongan->lokasi) }}" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pelagic-blue">
                         </div>
+
+                        <!-- Gambar -->
+                        <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Gambar Pendukung (Opsional)</label>
+                            
+                            <!-- Image Preview Area -->
+                            <div class="mb-4 relative group" id="imagePreviewContainer" style="{{ $lowongan->gambar ? '' : 'display: none;' }}">
+                                <img id="imagePreview" src="{{ $lowongan->gambar ? asset('storage/' . $lowongan->gambar) : '' }}" alt="Preview" class="w-full h-48 object-cover rounded-xl border border-gray-200">
+                                <button type="button" id="removeImageBtn" class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition-colors" title="Hapus Gambar">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                <input type="hidden" name="delete_image" id="deleteImageInput" value="0">
+                            </div>
+
+                            <!-- Upload Button -->
+                            <div class="relative">
+                                <input type="file" name="gambar" id="gambarInput" accept="image/*" class="hidden">
+                                <label for="gambarInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-pelagic-blue transition-colors">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                        <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">Klik untuk upload</span></p>
+                                        <p class="text-xs text-gray-500">PNG, JPG (MAX. 2MB)</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="space-y-6">
@@ -136,6 +162,42 @@
         upahInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             e.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        });
+
+        // Image Handling
+        const gambarInput = document.getElementById('gambarInput');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+        const deleteImageInput = document.getElementById('deleteImageInput');
+
+        // Show preview when file selected
+        gambarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate size
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Ukuran file terlalu besar! Maksimal 2MB.');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';
+                    deleteImageInput.value = '0'; // Reset delete flag
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle remove image
+        removeImageBtn.addEventListener('click', function() {
+            imagePreview.src = '';
+            imagePreviewContainer.style.display = 'none';
+            gambarInput.value = ''; // Clear file input
+            deleteImageInput.value = '1'; // Set delete flag
         });
     </script>
 </body>

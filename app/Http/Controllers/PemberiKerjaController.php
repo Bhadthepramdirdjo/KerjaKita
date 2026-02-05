@@ -442,4 +442,64 @@ class PemberiKerjaController extends Controller
 
         return view('pemberi-kerja.konfirmasi-pekerja', compact('pekerjaMenunggu', 'pekerjaDikonfirmasi'));
     }
+
+    /**
+     * Halaman Profil Pemberi Kerja
+     */
+    public function profil()
+    {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
+        // Ambil data pemberi kerja
+        $pemberiKerja = DB::table('pemberikerja')
+            ->join('user', 'pemberikerja.idUser', '=', 'user.idUser')
+            ->where('pemberikerja.idPemberiKerja', $idPemberiKerja)
+            ->select('pemberikerja.*', 'user.nama', 'user.email', 'user.foto_profil', 'user.username')
+            ->first();
+
+        // Ambil riwayat posting lowongan
+        $riwayatLowongan = DB::table('lowongan')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+            
+        return view('pemberi-kerja.profil', compact('pemberiKerja', 'riwayatLowongan'));
+    }
+
+    /**
+     * Update Profil Pemberi Kerja
+     */
+    public function updateProfil(Request $request)
+    {
+        $request->validate([
+            'nama_perusahaan' => 'nullable|string|max:255',
+            'alamat' => 'nullable|string',
+            'no_telp' => 'nullable|string|max:20',
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+        
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        $pemberiKerja = DB::table('pemberikerja')->where('idPemberiKerja', $idPemberiKerja)->first();
+        
+        // Update Foto Profil jika ada
+        if ($request->hasFile('foto_profil')) {
+            $path = $request->file('foto_profil')->store('profil', 'public');
+            DB::table('user')->where('idUser', $pemberiKerja->idUser)->update([
+                'foto_profil' => $path
+            ]);
+        }
+        
+        // Update Info Pemberi Kerja
+        DB::table('pemberikerja')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->update([
+                'nama_perusahaan' => $request->nama_perusahaan,
+                'alamat' => $request->alamat,
+                'no_telp' => $request->no_telp,
+                'updated_at' => now()
+            ]);
+            
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
+    }
 }
