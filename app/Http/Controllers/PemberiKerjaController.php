@@ -85,77 +85,27 @@ class PemberiKerjaController extends Controller
             ->where('lamaran.is_read', false)
             ->count();
 
-        // 2. Ambil Daftar Pekerjaan (untuk Slider)
-        // Kita ambil pekerjaan terbaru, tapi hanya satu per lowongan (hindari duplikat)
-        $pekerjaanList = DB::table('pekerjaan as pk1')
-            ->select('pk1.idPekerjaan')
-            ->join('lamaran', 'pk1.idLamaran', '=', 'lamaran.idLamaran')
-            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
-            ->whereRaw('pk1.idPekerjaan = (
-                SELECT MAX(pk2.idPekerjaan) 
-                FROM pekerjaan pk2 
-                JOIN lamaran lm ON pk2.idLamaran = lm.idLamaran
-                JOIN lowongan lw ON lm.idLowongan = lw.idLowongan
-                WHERE lw.idLowongan = lowongan.idLowongan
-            )')
-            ->pluck('pk1.idPekerjaan')
-            ->toArray();
-        
-        $pekerjaan = DB::table('pekerjaan')
-            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
-            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-            ->join('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
-            ->join('user', 'pekerja.idUser', '=', 'user.idUser')
+        // 2. Ambil Daftar Lowongan Aktif (untuk Slider)
+        // Tampilkan semua lowongan aktif + pekerjaan jika ada
+        $pekerjaan = DB::table('lowongan')
             ->select(
-                'pekerjaan.idPekerjaan',
-                'pekerjaan.status_pekerjaan',
-                'pekerjaan.tanggal_mulai',
-                'pekerjaan.tanggal_selesai',
+                DB::raw('NULL as idPekerjaan'),
+                DB::raw('"aktif" as status_pekerjaan'),
+                DB::raw('NULL as tanggal_mulai'),
+                DB::raw('NULL as tanggal_selesai'),
                 'lowongan.idLowongan',
                 'lowongan.judul', 
                 'lowongan.upah', 
                 'lowongan.lokasi',
                 'lowongan.idPemberiKerja',
-                'lamaran.idLamaran',
-                'user.nama as nama_pekerja'
+                DB::raw('NULL as idLamaran'),
+                DB::raw('"Belum ada pekerja" as nama_pekerja')
             )
-            ->whereIn('pekerjaan.idPekerjaan', $pekerjaanList)
-            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
-            ->orderBy('pekerjaan.created_at', 'desc')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->where('status', 'aktif')
+            ->orderBy('created_at', 'desc')
             ->limit(5)
-            ->get()
-            ->filter(function($item) use ($idPemberiKerja) {
-                // Double check - filter untuk pastikan hanya lowongan milik user ini
-                return $item->idPemberiKerja == $idPemberiKerja;
-            });
-
-        // Jika tidak ada pekerjaan aktif, tampilkan lowongan aktif saja
-        if ($pekerjaan->isEmpty()) {
-            $pekerjaan = DB::table('lowongan')
-                ->select(
-                    DB::raw('NULL as idPekerjaan'),
-                    DB::raw('"aktif" as status_pekerjaan'),
-                    DB::raw('NULL as tanggal_mulai'),
-                    DB::raw('NULL as tanggal_selesai'),
-                    'idLowongan',
-                    'judul', 
-                    'upah', 
-                    'lokasi',
-                    'idPemberiKerja',
-                    DB::raw('NULL as idLamaran'),
-                    DB::raw('"Belum ada pekerja" as nama_pekerja')
-                )
-                ->where('idPemberiKerja', $idPemberiKerja)
-                ->where('status', 'aktif')
-                ->orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get()
-                ->filter(function($item) use ($idPemberiKerja) {
-                    // Double check - filter untuk pastikan hanya lowongan milik user ini
-                    return $item->idPemberiKerja == $idPemberiKerja;
-                });
-        }
+            ->get();
 
         return view('pemberi-kerja.dashboard', compact('stats', 'pekerjaan', 'pekerjaMenunggu', 'notifikasiLamaranBaru'));
     }
