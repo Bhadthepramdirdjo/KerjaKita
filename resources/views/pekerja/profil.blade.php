@@ -124,7 +124,8 @@
                             <button type="button" 
                                     id="btnUbahFoto" 
                                     onclick="document.getElementById('fotoInput').click()" 
-                                    class="hidden mb-4 px-4 py-2 bg-pelagic-blue hover:bg-abyss-teal text-white rounded-lg transition-colors text-sm">
+                                    disabled
+                                    class="px-4 py-2 bg-pelagic-blue hover:bg-abyss-teal disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm mb-4">
                                 <i class="fas fa-camera mr-2"></i>
                                 Ubah Foto
                             </button>
@@ -396,11 +397,13 @@
                     input.classList.add('bg-white', 'border-2');
                 });
                 
-                // Toggle buttons
+                // Toggle buttons - enable ubah foto
                 btnEdit.classList.add('hidden');
                 btnSimpan.classList.remove('hidden');
                 btnBatal.classList.remove('hidden');
-                btnUbahFoto.classList.remove('hidden');
+                btnUbahFoto.disabled = false;
+                btnUbahFoto.style.opacity = '1';
+                btnUbahFoto.style.pointerEvents = 'auto';
             } else {
                 // Restore original values
                 inputs.forEach(id => {
@@ -415,11 +418,13 @@
                 document.getElementById('fotoInput').value = '';
                 document.getElementById('fotoFileName').textContent = '';
                 
-                // Toggle buttons
+                // Toggle buttons - disable ubah foto
                 btnEdit.classList.remove('hidden');
                 btnSimpan.classList.add('hidden');
                 btnBatal.classList.add('hidden');
-                btnUbahFoto.classList.add('hidden');
+                btnUbahFoto.disabled = true;
+                btnUbahFoto.style.opacity = '0.5';
+                btnUbahFoto.style.pointerEvents = 'none';
             }
         }
         

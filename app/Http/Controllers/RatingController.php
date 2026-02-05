@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class RatingController extends Controller
 {
@@ -104,9 +105,21 @@ class RatingController extends Controller
                 'created_at' => now()
             ]);
 
+            // 7. Buat notifikasi untuk pemberi kerja
+            $pemberiKerja = DB::table('PemberiKerja')->where('idPemberiKerja', $pekerjaan->idPemberiKerja)->first();
+            if ($pemberiKerja) {
+                DB::table('notifikasi')->insert([
+                    'idUser' => $pemberiKerja->idUser,
+                    'tipe_notifikasi' => 'rating_dikirim',
+                    'pesan' => "Rating Anda untuk '<strong>{$pekerjaan->judul}</strong>' telah terkirim kepada pekerja. Anda tidak dapat mengubah rating ini lagi.",
+                    'is_read' => 0,
+                    'created_at' => now()
+                ]);
+            }
+
             DB::commit();
 
-            return redirect()->back()->with('success', 'Rating berhasil diberikan!');
+            return redirect()->back()->with('success', 'Rating berhasil diberikan! Pekerja sudah menerima rating Anda.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -120,8 +133,7 @@ class RatingController extends Controller
     public function index()
     {
         // Ambil ID user yang login
-        // Sementara pakai dummy
-        $idUser = 1;
+        $idUser = Auth::id();
         
         // Tentukan role user
         $user = DB::table('User')->where('idUser', $idUser)->first();

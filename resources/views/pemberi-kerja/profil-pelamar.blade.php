@@ -43,9 +43,6 @@
             <a href="{{ route('pemberi-kerja.dashboard') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-home text-xl"></i>
             </a>
-            <a href="{{ route('pemberi-kerja.konfirmasi-pekerja') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-user-check text-2xl"></i>
-            </a>
             <a href="{{ route('pemberi-kerja.lowongan-saya') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-briefcase text-2xl"></i>
             </a>

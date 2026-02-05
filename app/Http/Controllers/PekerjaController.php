@@ -260,6 +260,93 @@ class PekerjaController extends Controller
     
     return view('pekerja.profil', compact('pekerja', 'rating', 'totalRating', 'pengalamanKerja', 'ulasanList'));
 }
+
+    /**
+     * Halaman Profil Publik Pekerja (untuk pemberi kerja lihat)
+     */
+    public function profilPublik($id)
+    {
+        // Ambil data pekerja berdasarkan idPekerja
+        $pekerja = DB::table('pekerja')
+            ->join('user', 'pekerja.idUser', '=', 'user.idUser')
+            ->where('pekerja.idPekerja', $id)
+            ->select('pekerja.*', 'user.nama', 'user.email', 'user.foto_profil', 'user.alamat', 'user.no_hp')
+            ->first();
+            
+        if (!$pekerja) {
+            abort(404, 'Pekerja tidak ditemukan');
+        }
+        
+        // Ambil rating pekerja
+        $ratingData = DB::table('rating')
+            ->join('pekerjaan', 'rating.idPekerjaan', '=', 'pekerjaan.idPekerjaan')
+            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+            ->where('lamaran.idPekerja', $pekerja->idPekerja)
+            ->where('rating.pemberi_rating', 'PemberiKerja')
+            ->select(
+                DB::raw('AVG(rating.nilai_rating) as rating_average'),
+                DB::raw('COUNT(rating.idRating) as total_rating')
+            )
+            ->first();
+        
+        $rating = $ratingData->rating_average ?? 0;
+        $totalRating = $ratingData->total_rating ?? 0;
+        
+        // Ambil pengalaman kerja
+        $pengalamanKerja = DB::table('pekerjaan')
+            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+            ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+            ->where('lamaran.idPekerja', $pekerja->idPekerja)
+            ->where('pekerjaan.status_pekerjaan', 'selesai')
+            ->select(
+                'lowongan.judul',
+                'lowongan.deskripsi',
+                'PemberiKerja.nama_perusahaan',
+                'pekerjaan.tanggal_mulai',
+                'pekerjaan.tanggal_selesai',
+                DB::raw('DATEDIFF(pekerjaan.tanggal_selesai, pekerjaan.tanggal_mulai) as durasi_hari')
+            )
+            ->orderBy('pekerjaan.tanggal_selesai', 'desc')
+            ->get()
+            ->map(function($item) {
+                if ($item->durasi_hari) {
+                    if ($item->durasi_hari < 7) {
+                        $item->durasi = $item->durasi_hari . ' hari';
+                    } elseif ($item->durasi_hari < 30) {
+                        $minggu = floor($item->durasi_hari / 7);
+                        $item->durasi = $minggu . ' minggu';
+                    } else {
+                        $bulan = floor($item->durasi_hari / 30);
+                        $item->durasi = $bulan . ' bulan';
+                    }
+                } else {
+                    $item->durasi = '-';
+                }
+                return $item;
+            });
+        
+        // Ambil ulasan terbaru
+        $ulasanList = DB::table('rating')
+            ->join('pekerjaan', 'rating.idPekerjaan', '=', 'pekerjaan.idPekerjaan')
+            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+            ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+            ->join('user', 'PemberiKerja.idUser', '=', 'user.idUser')
+            ->where('lamaran.idPekerja', $pekerja->idPekerja)
+            ->where('rating.pemberi_rating', 'PemberiKerja')
+            ->select(
+                'rating.nilai_rating',
+                'rating.ulasan',
+                'rating.created_at',
+                'lowongan.judul as judul_pekerjaan',
+                'user.nama as nama_pemberi_kerja'
+            )
+            ->orderBy('rating.created_at', 'desc')
+            ->get();
+        
+        return view('pekerja.profil', compact('pekerja', 'rating', 'totalRating', 'pengalamanKerja', 'ulasanList'));
+    }
     
     /**
      * Update Profil Pekerja

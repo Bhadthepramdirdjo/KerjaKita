@@ -4,21 +4,48 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PemberiKerjaController extends Controller
 {
+    /**
+     * Helper: Ambil ID Pemberi Kerja dari user yang login
+     */
+    private function getIdPemberiKerja()
+    {
+        $idUser = Auth::id();
+        $pemberiKerja = DB::table('PemberiKerja')->where('idUser', $idUser)->first();
+        
+        if (!$pemberiKerja) {
+            // Jika tidak ada entry PemberiKerja, buat satu
+            $user = Auth::user();
+            if ($user->tipe_user !== 'PemberiKerja' && $user->peran !== 'PemberiKerja') {
+                abort(403, 'User bukan pemberi kerja');
+            }
+            
+            // Buat entry PemberiKerja jika belum ada
+            $id = DB::table('PemberiKerja')->insertGetId([
+                'idUser' => $idUser,
+                'nama_perusahaan' => $user->nama,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            return $id;
+        }
+        
+        return $pemberiKerja->idPemberiKerja;
+    }
+    
     /**
      * Menampilkan Dashboard Pemberi Kerja
      */
     public function dashboard()
     {
-        // 1. Ambil Statistik
-        // Di aplikasi nyata, kita filter berdasarkan ID user yang login
-        // Saat ini kita pakai dummy ID karena belum login
-        $idPemberiKerja = 1; 
-
+        // 1. Ambil ID Pemberi Kerja dari user yang login
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
         // Menggunakan Stored Procedure yang sudah ada di database Anda!
-        // CALL sp_dashboard_pemberi_kerja(1)
+        // CALL sp_dashboard_pemberi_kerja($idPemberiKerja)
         // Namun untuk kompatibilitas Laravel, kita query manual saja agar aman
         
         $stats = [
@@ -59,7 +86,20 @@ class PemberiKerjaController extends Controller
             ->count();
 
         // 2. Ambil Daftar Pekerjaan (untuk Slider)
-        // Kita ambil pekerjaan yang sedang berjalan atau butuh review
+        // Kita ambil pekerjaan terbaru per lamaran untuk avoid duplikat
+        $pekerjaanList = DB::table('pekerjaan as pk1')
+            ->select('pk1.*')
+            ->whereRaw('pk1.idPekerjaan = (
+                SELECT MAX(pk2.idPekerjaan) 
+                FROM pekerjaan pk2 
+                WHERE pk2.idLamaran = pk1.idLamaran
+            )')
+            ->join('lamaran', 'pk1.idLamaran', '=', 'lamaran.idLamaran')
+            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
+            ->pluck('pk1.idPekerjaan')
+            ->toArray();
+        
         $pekerjaan = DB::table('pekerjaan')
             ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
             ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
@@ -74,13 +114,19 @@ class PemberiKerjaController extends Controller
                 'lowongan.judul', 
                 'lowongan.upah', 
                 'lowongan.lokasi',
+                'lowongan.idPemberiKerja',
                 'lamaran.idLamaran',
                 'user.nama as nama_pekerja'
             )
+            ->whereIn('pekerjaan.idPekerjaan', $pekerjaanList)
             ->where('lowongan.idPemberiKerja', $idPemberiKerja)
             ->orderBy('pekerjaan.created_at', 'desc')
             ->limit(5)
-            ->get();
+            ->get()
+            ->filter(function($item) use ($idPemberiKerja) {
+                // Double check - filter untuk pastikan hanya lowongan milik user ini
+                return $item->idPemberiKerja == $idPemberiKerja;
+            });
 
         // Jika tidak ada pekerjaan aktif, tampilkan lowongan aktif saja
         if ($pekerjaan->isEmpty()) {
@@ -94,6 +140,7 @@ class PemberiKerjaController extends Controller
                     'judul', 
                     'upah', 
                     'lokasi',
+                    'idPemberiKerja',
                     DB::raw('NULL as idLamaran'),
                     DB::raw('"Belum ada pekerja" as nama_pekerja')
                 )
@@ -101,7 +148,11 @@ class PemberiKerjaController extends Controller
                 ->where('status', 'aktif')
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
-                ->get();
+                ->get()
+                ->filter(function($item) use ($idPemberiKerja) {
+                    // Double check - filter untuk pastikan hanya lowongan milik user ini
+                    return $item->idPemberiKerja == $idPemberiKerja;
+                });
         }
 
         return view('pemberi-kerja.dashboard', compact('stats', 'pekerjaan', 'pekerjaMenunggu', 'notifikasiLamaranBaru'));
@@ -206,7 +257,7 @@ class PemberiKerjaController extends Controller
             'status' => 'required|in:aktif,draft'
         ]);
 
-        $idPemberiKerja = 1; // TODO: Get from auth()->user()
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         // Clean upah value - remove Rp and dots
         $upahValue = preg_replace('/[^0-9]/', '', $validated['upah']);
@@ -249,7 +300,7 @@ class PemberiKerjaController extends Controller
     public function lowonganSaya()
     {
         // Ambil ID pemberi kerja dari user yang login
-        $idPemberiKerja = 1; // TODO: Get from auth()->user()
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         // Reset Notifikasi: Tandai lamaran baru sebagai sudah dibaca saat membuka halaman ini
         // Sesuai request user: "kalo pemberi kerja udah membuka halaman nya, notif nya hilang"
@@ -293,7 +344,7 @@ class PemberiKerjaController extends Controller
      */
     public function konfirmasiPekerja()
     {
-        $idPemberiKerja = 1; // TODO: Get from auth()->user()
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         // Pekerja yang status lamarannya 'diterima' tapi belum ada pekerjaan (menunggu konfirmasi)
         $pekerjaMenunggu = DB::table('lamaran')

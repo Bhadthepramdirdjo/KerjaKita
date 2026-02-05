@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'rating/beri',
         ]);
+        
+        // Register custom middleware aliases
+        $middleware->alias([
+            'pemberi_kerja' => \App\Http\Middleware\EnsurePemberiKerjaAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

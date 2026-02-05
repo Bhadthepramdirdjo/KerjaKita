@@ -4,9 +4,38 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PekerjaanController extends Controller
 {
+    /**
+     * Helper: Ambil ID Pemberi Kerja dari user yang login
+     */
+    private function getIdPemberiKerja()
+    {
+        $idUser = Auth::id();
+        $pemberiKerja = DB::table('PemberiKerja')->where('idUser', $idUser)->first();
+        
+        if (!$pemberiKerja) {
+            // Jika tidak ada entry PemberiKerja, buat satu
+            $user = Auth::user();
+            if ($user->tipe_user !== 'PemberiKerja' && $user->peran !== 'PemberiKerja') {
+                abort(403, 'User bukan pemberi kerja');
+            }
+            
+            // Buat entry PemberiKerja jika belum ada
+            $id = DB::table('PemberiKerja')->insertGetId([
+                'idUser' => $idUser,
+                'nama_perusahaan' => $user->nama,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            return $id;
+        }
+        
+        return $pemberiKerja->idPemberiKerja;
+    }
+    
     /**
      * FITUR 7: Konfirmasi Pekerjaan Selesai
      * Mengubah status pekerjaan menjadi 'selesai'
@@ -77,8 +106,7 @@ class PekerjaanController extends Controller
     public function index()
     {
         // Ambil ID pemberi kerja dari user yang login
-        // Sementara pakai dummy ID
-        $idPemberiKerja = 1;
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         $pekerjaan = DB::table('pekerjaan')
             ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
@@ -106,6 +134,8 @@ class PekerjaanController extends Controller
      */
     public function show($id)
     {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
         $pekerjaan = DB::table('pekerjaan')
             ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
             ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
@@ -125,17 +155,17 @@ class PekerjaanController extends Controller
                 'lowongan.idPemberiKerja'
             )
             ->where('pekerjaan.idPekerjaan', $id)
+            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
             ->first();
 
         if (!$pekerjaan) {
-            return redirect()->route('pemberi-kerja.dashboard')
-                ->with('error', 'Pekerjaan tidak ditemukan');
+            abort(403, 'Anda tidak memiliki akses ke pekerjaan ini');
         }
 
         // Cek apakah sudah ada rating
         $rating = DB::table('rating')
             ->where('idPekerjaan', $id)
-            ->where('idPemberiKerja', $pekerjaan->idPemberiKerja)
+            ->where('pemberi_rating', 'PemberiKerja')
             ->first();
 
         return view('pemberi-kerja.pekerjaan.detail', compact('pekerjaan', 'rating'));

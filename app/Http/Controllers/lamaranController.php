@@ -4,23 +4,55 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class LamaranController extends Controller
 {
+    /**
+     * Helper: Ambil ID Pemberi Kerja dari user yang login
+     */
+    private function getIdPemberiKerja()
+    {
+        $idUser = Auth::id();
+        $pemberiKerja = DB::table('PemberiKerja')->where('idUser', $idUser)->first();
+        
+        if (!$pemberiKerja) {
+            // Jika tidak ada entry PemberiKerja, buat satu
+            $user = Auth::user();
+            if ($user->tipe_user !== 'PemberiKerja' && $user->peran !== 'PemberiKerja') {
+                abort(403, 'User bukan pemberi kerja');
+            }
+            
+            // Buat entry PemberiKerja jika belum ada
+            $id = DB::table('PemberiKerja')->insertGetId([
+                'idUser' => $idUser,
+                'nama_perusahaan' => $user->nama,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            return $id;
+        }
+        
+        return $pemberiKerja->idPemberiKerja;
+    }
+    
     /**
      * FITUR 5: Lihat Pelamar
      * Menampilkan daftar pelamar untuk lowongan tertentu
      */
     public function pelamar($id)
     {
+        // Pastikan pemberi kerja hanya bisa lihat lowongan miliknya
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
         // Ambil data lowongan
         $lowongan = DB::table('lowongan')
             ->where('idLowongan', $id)
+            ->where('idPemberiKerja', $idPemberiKerja)
             ->first();
 
         if (!$lowongan) {
-            return redirect()->route('pemberi-kerja.lowongan-saya')
-                ->with('error', 'Lowongan tidak ditemukan');
+            abort(403, 'Anda tidak memiliki akses ke lowongan ini');
         }
 
         // Ambil daftar pelamar dengan detail profil

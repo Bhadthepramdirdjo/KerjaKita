@@ -98,9 +98,25 @@
             transition: color 0.2s;
         }
 
-        .star-input:hover,
         .star-input.active {
             color: #FFD700;
+        }
+
+        /* Arrow Button Styles */
+        .arrow-btn {
+            transition: all 0.3s ease;
+        }
+
+        .arrow-btn:hover:not([style*="pointer-events: none"]) {
+            background-color: #289FB7 !important;
+        }
+
+        .arrow-btn:hover:not([style*="pointer-events: none"]) i {
+            color: white;
+        }
+
+        .arrow-btn:active:not([style*="pointer-events: none"]) {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -117,10 +133,6 @@
             <button class="w-12 h-12 rounded-xl flex items-center justify-center bg-keel-black text-white shadow-lg transform scale-110">
                 <i class="fas fa-home text-xl"></i>
             </button>
-            <a href="{{ route('pemberi-kerja.konfirmasi-pekerja') }}" class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors relative">
-                <i class="fas fa-user-check text-2xl"></i>
-                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">{{ $pekerjaMenunggu ?? 0 }}</span>
-            </a>
             <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
@@ -163,9 +175,13 @@
             </a>
 
             <!-- Profile Icon -->
-            <button class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
-                <i class="far fa-user text-2xl text-keel-black"></i>
-            </button>
+            <a href="{{ route('pemberi-kerja.pengaturan') }}" class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
+                @if(auth()->user()->foto_profil)
+                    <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="Foto Profil" class="w-full h-full object-cover">
+                @else
+                    <i class="far fa-user text-2xl text-keel-black"></i>
+                @endif
+            </a>
         </header>
 
         <!-- Page Title & Stats Grid -->
@@ -201,16 +217,20 @@
         <div class="flex-1 flex items-center relative px-2 md:px-8 pb-8 overflow-hidden">
             
             <!-- Left Arrow -->
-            <button id="scrollLeft" class="absolute left-2 md:left-4 z-20 w-10 h-10 md:w-12 md:h-12 bg-transparent hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
-                <i class="fas fa-chevron-left text-3xl md:text-4xl text-keel-black"></i>
+            <button id="scrollLeft" class="arrow-btn absolute left-2 md:left-4 z-20 w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-pelagic-blue rounded-full flex items-center justify-center transition-all duration-300">
+                <i class="fas fa-chevron-left text-2xl md:text-3xl text-keel-black hover:text-white"></i>
             </button>
 
-            <!-- Scrollable Container -->
-            <div id="cardContainer" class="scrolling-wrapper flex gap-6 px-12 overflow-x-auto no-scrollbar w-full py-4 items-center h-full">
+            <!-- Scrollable Container - Show exactly 4 cards -->
+            <div id="cardContainer" class="scrolling-wrapper flex gap-6 overflow-x-auto no-scrollbar w-full py-4 items-center h-full px-16 md:px-20">
                 
                 @forelse($pekerjaan as $job)
+                <!-- Debug Info (Remove later) -->
+                @if(config('app.debug'))
+                <div style="display:none;" class="debug-info">idPemberiKerja: {{ $job->idPemberiKerja ?? 'NULL' }}</div>
+                @endif
                 <!-- Job Card -->
-                <div class="card-snap min-w-[300px] md:min-w-[340px] bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100 flex-shrink-0 flex flex-col h-[420px] transition-transform hover:-translate-y-1">
+                <div class="card-snap min-w-[calc(25%-18px)] bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100 flex-shrink-0 flex flex-col h-[420px] transition-transform hover:-translate-y-1">
                     <!-- Top White Section -->
                     <div class="flex-1 px-8 py-6 flex flex-col justify-start">
                         <!-- Header -->
@@ -252,7 +272,7 @@
                                     <a href="{{ route('pemberi-kerja.lowongan.pelamar', $job->idLowongan) }}" class="w-full bg-white text-keel-black font-bold py-2.5 px-4 rounded-full hover:bg-seafoam-bloom transition-colors shadow-lg text-sm tracking-wide text-center">
                                         Lihat Pelamar
                                     </a>
-                                    <form action="{{ route('pekerjaan.selesai', $job->idPekerjaan) }}" method="POST" class="w-full">
+                                    <form action="{{ route('pemberi-kerja.pekerjaan.selesai', $job->idPekerjaan) }}" method="POST" class="w-full">
                                         @csrf
                                         <button type="submit" class="w-full bg-white text-keel-black font-bold py-2.5 px-4 rounded-full hover:bg-green-100 transition-colors shadow-lg text-sm tracking-wide text-center">
                                             Konfirmasi Selesai
@@ -302,8 +322,8 @@
             </div>
 
             <!-- Right Arrow -->
-            <button id="scrollRight" class="absolute right-2 md:right-4 z-20 w-10 h-10 md:w-12 md:h-12 bg-transparent hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
-                <i class="fas fa-chevron-right text-3xl md:text-4xl text-keel-black"></i>
+            <button id="scrollRight" class="arrow-btn absolute right-2 md:right-4 z-20 w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-pelagic-blue rounded-full flex items-center justify-center transition-all duration-300">
+                <i class="fas fa-chevron-right text-2xl md:text-3xl text-keel-black hover:text-white"></i>
             </button>
         </div>
     </main>
@@ -312,14 +332,69 @@
         const container = document.getElementById('cardContainer');
         const nextBtn = document.getElementById('scrollRight');
         const prevBtn = document.getElementById('scrollLeft');
+        
+        // Calculate scroll distance (one card width + gap)
+        // 25% of container width (for 4 cards) + gap of 24px
+        function getScrollDistance() {
+            const containerWidth = container.clientWidth;
+            // Each card takes 25% of width + gap
+            return (containerWidth / 4) + 24;
+        }
 
+        // Update arrow visibility and button states based on scroll position
+        function updateArrowVisibility() {
+            const scrollLeft = container.scrollLeft;
+            const scrollWidth = container.scrollWidth;
+            const clientWidth = container.clientWidth;
+            const isAtStart = scrollLeft <= 10;
+            const isAtEnd = scrollLeft >= (scrollWidth - clientWidth - 10);
+            
+            // Update left button
+            if (isAtStart) {
+                prevBtn.style.opacity = '0.3';
+                prevBtn.style.pointerEvents = 'none';
+                prevBtn.style.cursor = 'default';
+            } else {
+                prevBtn.style.opacity = '1';
+                prevBtn.style.pointerEvents = 'auto';
+                prevBtn.style.cursor = 'pointer';
+            }
+            
+            // Update right button
+            if (isAtEnd) {
+                nextBtn.style.opacity = '0.3';
+                nextBtn.style.pointerEvents = 'none';
+                nextBtn.style.cursor = 'default';
+            } else {
+                nextBtn.style.opacity = '1';
+                nextBtn.style.pointerEvents = 'auto';
+                nextBtn.style.cursor = 'pointer';
+            }
+        }
+
+        // Scroll right (next card)
         nextBtn.addEventListener('click', () => {
-            container.scrollBy({ left: 320, behavior: 'smooth' });
+            const distance = getScrollDistance();
+            container.scrollBy({ left: distance, behavior: 'smooth' });
+            setTimeout(updateArrowVisibility, 100);
         });
 
+        // Scroll left (previous card)
         prevBtn.addEventListener('click', () => {
-            container.scrollBy({ left: -320, behavior: 'smooth' });
+            const distance = getScrollDistance();
+            container.scrollBy({ left: -distance, behavior: 'smooth' });
+            setTimeout(updateArrowVisibility, 100);
         });
+
+        // Handle scroll on container
+        container.addEventListener('scroll', updateArrowVisibility);
+        window.addEventListener('resize', () => {
+            setTimeout(updateArrowVisibility, 100);
+        });
+
+        // Initialize arrow visibility on page load
+        window.addEventListener('load', updateArrowVisibility);
+        setTimeout(updateArrowVisibility, 500);
 
         // Rating Modal Functions
         let selectedRating = 0;

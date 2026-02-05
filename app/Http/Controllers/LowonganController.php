@@ -4,16 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class LowonganController extends Controller
 {
+    /**
+     * Helper: Ambil ID Pemberi Kerja dari user yang login
+     */
+    private function getIdPemberiKerja()
+    {
+        $idUser = Auth::id();
+        $pemberiKerja = DB::table('PemberiKerja')->where('idUser', $idUser)->first();
+        
+        if (!$pemberiKerja) {
+            // Jika tidak ada entry PemberiKerja, buat satu
+            $user = Auth::user();
+            if ($user->tipe_user !== 'PemberiKerja' && $user->peran !== 'PemberiKerja') {
+                abort(403, 'User bukan pemberi kerja');
+            }
+            
+            // Buat entry PemberiKerja jika belum ada
+            $id = DB::table('PemberiKerja')->insertGetId([
+                'idUser' => $idUser,
+                'nama_perusahaan' => $user->nama,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            return $id;
+        }
+        
+        return $pemberiKerja->idPemberiKerja;
+    }
+    
     /**
      * Display a listing of all lowongan (for employer)
      */
     public function index()
     {
         // Ambil ID pemberi kerja dari user yang login
-        $idPemberiKerja = auth()->user()->idPemberiKerja ?? 1; // TODO: Get from authenticated user
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         $lowongan = DB::table('lowongan')
             ->where('idPemberiKerja', $idPemberiKerja)
@@ -44,7 +73,7 @@ class LowonganController extends Controller
             'kategori' => 'required|string|max:100',
         ]);
 
-        $idPemberiKerja = auth()->user()->idPemberiKerja ?? 1; // TODO: Get from authenticated user
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         DB::table('lowongan')->insert([
             'idPemberiKerja' => $idPemberiKerja,
@@ -68,13 +97,15 @@ class LowonganController extends Controller
      */
     public function show($id)
     {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
         $lowongan = DB::table('lowongan')
             ->where('idLowongan', $id)
+            ->where('idPemberiKerja', $idPemberiKerja)
             ->first();
 
         if (!$lowongan) {
-            return redirect()->route('pemberi-kerja.lowongan.index')
-                ->with('error', 'Lowongan tidak ditemukan');
+            abort(403, 'Anda tidak memiliki akses ke lowongan ini');
         }
 
         return view('pemberi-kerja.lowongan.detail', compact('lowongan'));
@@ -85,13 +116,15 @@ class LowonganController extends Controller
      */
     public function edit($id)
     {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
         $lowongan = DB::table('lowongan')
             ->where('idLowongan', $id)
+            ->where('idPemberiKerja', $idPemberiKerja)
             ->first();
 
         if (!$lowongan) {
-            return redirect()->route('pemberi-kerja.lowongan.index')
-                ->with('error', 'Lowongan tidak ditemukan');
+            abort(403, 'Anda tidak memiliki akses ke lowongan ini');
         }
 
         return view('pemberi-kerja.lowongan.edit-lowongan', compact('lowongan'));
@@ -102,6 +135,18 @@ class LowonganController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
+        // Verifikasi ownership
+        $lowongan = DB::table('lowongan')
+            ->where('idLowongan', $id)
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->first();
+        
+        if (!$lowongan) {
+            abort(403, 'Anda tidak memiliki akses ke lowongan ini');
+        }
+        
         // Sanitasi format upah (hapus titik)
         if ($request->has('upah')) {
             $request->merge([
