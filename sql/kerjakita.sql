@@ -294,28 +294,12 @@ CREATE TABLE `lowongan` (
 INSERT INTO `lowongan` (`idLowongan`, `idPemberiKerja`, `judul`, `deskripsi`, `gambar`, `lokasi`, `upah`, `status`, `created_at`, `updated_at`) VALUES
 (1, 1, 'Developer Backend PHP', 'Dibutuhkan developer PHP berpengalaman untuk project web application', NULL, 'Bandung', 1500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
 (2, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', NULL, 'Bandung', 1200000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(3, 1, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(3, 2, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
 (4, 2, 'Content Writer Profesional', 'Menulis artikel berkualitas untuk blog perusahaan kami', NULL, 'Jakarta', 800000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
 (5, 2, 'Social Media Manager', 'Kelola social media dan buat konten menarik', NULL, 'Jakarta', 900000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(6, 2, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(6, 3, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
 (7, 3, 'Virtual Assistant', 'Bantu admin dan koordinasi meeting', NULL, 'Surabaya', 600000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(8, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
-(9, 1, 'Developer Backend PHP', 'Dibutuhkan developer PHP berpengalaman untuk project web application', NULL, 'Bandung', 1500000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(10, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', NULL, 'Bandung', 1200000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(11, 1, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(12, 2, 'Content Writer Profesional', 'Menulis artikel berkualitas untuk blog perusahaan kami', NULL, 'Jakarta', 800000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(13, 2, 'Social Media Manager', 'Kelola social media dan buat konten menarik', NULL, 'Jakarta', 900000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(14, 2, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(15, 3, 'Virtual Assistant', 'Bantu admin dan koordinasi meeting', NULL, 'Surabaya', 600000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(16, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
-(17, 1, 'Developer Backend PHP', 'Dibutuhkan developer PHP berpengalaman untuk project web application', NULL, 'Bandung', 1500000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(18, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', NULL, 'Bandung', 1200000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(19, 1, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(20, 2, 'Content Writer Profesional', 'Menulis artikel berkualitas untuk blog perusahaan kami', NULL, 'Jakarta', 800000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(21, 2, 'Social Media Manager', 'Kelola social media dan buat konten menarik', NULL, 'Jakarta', 900000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(22, 2, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(23, 3, 'Virtual Assistant', 'Bantu admin dan koordinasi meeting', NULL, 'Surabaya', 600000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
-(24, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45');
+(8, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19');
 
 -- --------------------------------------------------------
 
