@@ -249,18 +249,28 @@
                                             Beri Rating
                                         </button>
                                     @endif
+                                @elseif($job->status == 'draft')
+                                    <!-- Button untuk publikasi draft -->
+                                    <form action="{{ route('pemberi-kerja.lowongan.publikasi', $job->idLowongan) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full transition-colors text-sm">
+                                            <i class="fas fa-rocket mr-1"></i>
+                                            Publikasi
+                                        </button>
+                                    </form>
+                                    <a href="{{ route('pemberi-kerja.lowongan.edit', $job->idLowongan) }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-keel-black font-semibold rounded-full transition-colors text-sm">
+                                        <i class="fas fa-edit mr-1"></i>
+                                        Edit
+                                    </a>
                                 @else
                                     <a href="{{ route('pemberi-kerja.lowongan.pelamar', $job->idLowongan) }}" class="px-4 py-2 bg-pelagic-blue hover:bg-abyss-teal text-white font-semibold rounded-full transition-colors text-sm">
                                         <i class="fas fa-eye mr-1"></i>
                                         Lihat
                                     </a>
-                                @endif
-                                
-                                @if(!$job->status_pekerjaan && $job->status != 'tidak_aktif')
-                                <a href="{{ route('pemberi-kerja.lowongan.edit', $job->idLowongan) }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-keel-black font-semibold rounded-full transition-colors text-sm">
-                                    <i class="fas fa-edit mr-1"></i>
-                                    Edit
-                                </a>
+                                    <a href="{{ route('pemberi-kerja.lowongan.edit', $job->idLowongan) }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-keel-black font-semibold rounded-full transition-colors text-sm">
+                                        <i class="fas fa-edit mr-1"></i>
+                                        Edit
+                                    </a>
                                 @endif
                             </div>
                         </div>

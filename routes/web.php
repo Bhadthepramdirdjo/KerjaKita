@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/simpan-lowongan', [PemberiKerjaController::class, 'simpanLowongan'])->name('simpan-lowongan');
         Route::get('/rekomendasi-pekerja', [PemberiKerjaController::class, 'rekomendasiPekerja'])->name('rekomendasi-pekerja');
         Route::get('/lowongan-saya', [PemberiKerjaController::class, 'lowonganSaya'])->name('lowongan-saya');
+        Route::post('/lowongan/{id}/publikasi', [PemberiKerjaController::class, 'publikasiDraft'])->name('lowongan.publikasi');
         Route::get('/konfirmasi-pekerja', [PemberiKerjaController::class, 'konfirmasiPekerja'])->name('konfirmasi-pekerja');
         
         // Lowongan Routes

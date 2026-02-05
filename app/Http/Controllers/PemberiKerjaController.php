@@ -394,4 +394,35 @@ class PemberiKerjaController extends Controller
 
         return view('pemberi-kerja.konfirmasi-pekerja', compact('pekerjaMenunggu', 'pekerjaDikonfirmasi'));
     }
+
+    /**
+     * Publikasi Draft Lowongan
+     */
+    public function publikasiDraft($idLowongan)
+    {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+
+        // Pastikan lowongan milik pemberi kerja ini dan statusnya draft
+        $lowongan = DB::table('lowongan')
+            ->where('idLowongan', $idLowongan)
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->where('status', 'draft')
+            ->first();
+
+        if (!$lowongan) {
+            return redirect()->route('pemberi-kerja.lowongan-saya')
+                ->with('error', 'Lowongan tidak ditemukan atau sudah dipublikasi');
+        }
+
+        // Update status menjadi aktif
+        DB::table('lowongan')
+            ->where('idLowongan', $idLowongan)
+            ->update([
+                'status' => 'aktif',
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('pemberi-kerja.lowongan-saya')
+            ->with('success', 'Lowongan berhasil dipublikasikan!');
+    }
 }
