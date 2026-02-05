@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 03, 2026 at 11:21 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Waktu pembuatan: 05 Feb 2026 pada 06.59
+-- Versi server: 10.4.32-MariaDB
+-- Versi PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -23,7 +23,7 @@ SET time_zone = "+00:00";
 
 DELIMITER $$
 --
--- Procedures
+-- Prosedur
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cari_lowongan` (IN `p_keyword` VARCHAR(255), IN `p_lokasi` VARCHAR(255), IN `p_kategori` INT, IN `p_limit` INT, IN `p_offset` INT)   BEGIN
     SELECT DISTINCT l.* FROM v_lowongan_detail l
@@ -67,7 +67,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `activity_log`
+-- Struktur dari tabel `activity_log`
 --
 
 CREATE TABLE `activity_log` (
@@ -80,7 +80,7 @@ CREATE TABLE `activity_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `activity_log`
+-- Dumping data untuk tabel `activity_log`
 --
 
 INSERT INTO `activity_log` (`id_log`, `idUser`, `activity_type`, `description`, `ip_address`, `created_at`) VALUES
@@ -117,12 +117,48 @@ INSERT INTO `activity_log` (`id_log`, `idUser`, `activity_type`, `description`, 
 (31, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-02 23:01:30'),
 (32, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-02 23:07:07'),
 (33, 5, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-03 00:27:11'),
-(34, 6, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-03 00:27:19');
+(34, 6, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-03 00:27:19'),
+(35, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 19:57:20'),
+(36, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 19:59:18'),
+(37, 2, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 19:59:38'),
+(38, 2, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 20:00:03'),
+(39, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 20:00:48'),
+(40, 5, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 20:01:02'),
+(41, 2, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 20:01:19'),
+(42, 2, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 20:05:11'),
+(43, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 20:05:29'),
+(44, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 20:08:44'),
+(45, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 20:33:48'),
+(46, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 20:34:04'),
+(47, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 20:40:50'),
+(48, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 20:40:57'),
+(49, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 20:43:15'),
+(50, 3, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 20:43:35'),
+(51, 3, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 21:07:33'),
+(52, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 21:07:40'),
+(53, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 21:10:45'),
+(54, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 21:17:43'),
+(55, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 21:17:57'),
+(56, 6, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 21:18:19'),
+(57, 6, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 21:23:11'),
+(58, 3, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 21:23:40'),
+(59, 3, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 21:23:55'),
+(60, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 21:24:04'),
+(61, 5, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 21:41:30'),
+(62, 4, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 21:42:04'),
+(63, 4, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 21:57:43'),
+(64, 4, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 21:57:53'),
+(65, 4, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 22:01:35'),
+(66, 2, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 22:02:15'),
+(67, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 22:07:05'),
+(68, 6, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 22:07:27'),
+(69, 6, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-04 22:33:59'),
+(70, 5, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-04 22:34:46');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chat_conversation`
+-- Struktur dari tabel `chat_conversation`
 --
 
 CREATE TABLE `chat_conversation` (
@@ -137,7 +173,7 @@ CREATE TABLE `chat_conversation` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chat_message`
+-- Struktur dari tabel `chat_message`
 --
 
 CREATE TABLE `chat_message` (
@@ -150,7 +186,7 @@ CREATE TABLE `chat_message` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Triggers `chat_message`
+-- Trigger `chat_message`
 --
 DELIMITER $$
 CREATE TRIGGER `after_message_insert` AFTER INSERT ON `chat_message` FOR EACH ROW BEGIN
@@ -164,7 +200,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `favorit`
+-- Struktur dari tabel `favorit`
 --
 
 CREATE TABLE `favorit` (
@@ -177,7 +213,7 @@ CREATE TABLE `favorit` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `kategori`
+-- Struktur dari tabel `kategori`
 --
 
 CREATE TABLE `kategori` (
@@ -188,7 +224,7 @@ CREATE TABLE `kategori` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `kategori`
+-- Dumping data untuk tabel `kategori`
 --
 
 INSERT INTO `kategori` (`id_kategori`, `nama_kategori`, `deskripsi`, `created_at`) VALUES
@@ -205,7 +241,7 @@ INSERT INTO `kategori` (`id_kategori`, `nama_kategori`, `deskripsi`, `created_at
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lamaran`
+-- Struktur dari tabel `lamaran`
 --
 
 CREATE TABLE `lamaran` (
@@ -220,19 +256,22 @@ CREATE TABLE `lamaran` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `lamaran`
+-- Dumping data untuk tabel `lamaran`
 --
 
 INSERT INTO `lamaran` (`idLamaran`, `idLowongan`, `idPekerja`, `tanggal_lamaran`, `status_lamaran`, `is_read`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, '2025-02-01', 'pending', 1, '2026-02-01 07:01:15', '2026-02-03 08:25:44'),
-(2, 2, 1, '2025-02-01', 'ditolak', 1, '2026-02-01 07:01:15', '2026-02-03 02:41:33'),
-(3, 3, 2, '2025-02-01', 'diterima', 0, '2026-02-01 07:01:15', '2026-02-01 07:01:15'),
-(4, 5, 3, '2026-02-03', 'diterima', 1, '2026-02-03 00:25:14', '2026-02-03 08:25:44');
+(1, 1, 1, '0000-00-00', 'diterima', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(2, 2, 1, '0000-00-00', 'tertarik', 0, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(3, 3, 1, '0000-00-00', 'ditolak', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(4, 4, 2, '0000-00-00', 'diterima', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(5, 5, 2, '0000-00-00', 'tertarik', 0, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(6, 1, 3, '0000-00-00', 'diterima', 1, '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(7, 6, 3, '0000-00-00', 'tertarik', 0, '2026-02-05 05:21:19', '2026-02-05 05:21:19');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lowongan`
+-- Struktur dari tabel `lowongan`
 --
 
 CREATE TABLE `lowongan` (
@@ -249,20 +288,39 @@ CREATE TABLE `lowongan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `lowongan`
+-- Dumping data untuk tabel `lowongan`
 --
 
 INSERT INTO `lowongan` (`idLowongan`, `idPemberiKerja`, `judul`, `deskripsi`, `gambar`, `lokasi`, `upah`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Dibutuhkan Tukang Bersih-bersih Rumah', 'Mencari pekerja untuk membersihkan rumah 2 lantai. Pekerjaan 1 hari saja.', NULL, 'Bandung - Dago', 150000.00, 'aktif', '2026-02-01 07:01:15', '2026-02-01 07:01:15'),
-(2, 1, 'Butuh Tukang Bangunan untuk Renovasi', 'Renovasi kamar mandi dan dapur. Estimasi 1 minggu.', NULL, 'Bandung - Dipati Ukur', 500000.00, 'aktif', '2026-02-01 07:01:15', '2026-02-01 07:01:15'),
-(3, 2, 'Asisten Rumah Tangga Part Time', 'Dibutuhkan untuk memasak dan bersih-bersih 3x seminggu.', NULL, 'Bandung - Dago', 100000.00, 'aktif', '2026-02-01 07:01:15', '2026-02-01 07:01:15'),
-(4, 2, 'Tukang Kebun Harian', 'Merawat taman rumah, potong rumput, siram tanaman.', NULL, 'Bandung - Cibaduyut', 80000.00, 'aktif', '2026-02-01 07:01:15', '2026-02-01 07:01:15'),
-(5, 1, 'Front-End Web Dev', 'Membuat halaman sederhana untuk website ini', NULL, 'Rumah Saya', 600000.00, 'tidak_aktif', '2026-02-02 22:59:10', '2026-02-03 00:54:05');
+(1, 1, 'Developer Backend PHP', 'Dibutuhkan developer PHP berpengalaman untuk project web application', NULL, 'Bandung', 1500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(2, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', NULL, 'Bandung', 1200000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(3, 1, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(4, 2, 'Content Writer Profesional', 'Menulis artikel berkualitas untuk blog perusahaan kami', NULL, 'Jakarta', 800000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(5, 2, 'Social Media Manager', 'Kelola social media dan buat konten menarik', NULL, 'Jakarta', 900000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(6, 2, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(7, 3, 'Virtual Assistant', 'Bantu admin dan koordinasi meeting', NULL, 'Surabaya', 600000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(8, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:21:19', '2026-02-05 05:21:19'),
+(9, 1, 'Developer Backend PHP', 'Dibutuhkan developer PHP berpengalaman untuk project web application', NULL, 'Bandung', 1500000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(10, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', NULL, 'Bandung', 1200000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(11, 1, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(12, 2, 'Content Writer Profesional', 'Menulis artikel berkualitas untuk blog perusahaan kami', NULL, 'Jakarta', 800000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(13, 2, 'Social Media Manager', 'Kelola social media dan buat konten menarik', NULL, 'Jakarta', 900000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(14, 2, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(15, 3, 'Virtual Assistant', 'Bantu admin dan koordinasi meeting', NULL, 'Surabaya', 600000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(16, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:22:19', '2026-02-05 05:22:19'),
+(17, 1, 'Developer Backend PHP', 'Dibutuhkan developer PHP berpengalaman untuk project web application', NULL, 'Bandung', 1500000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(18, 1, 'UI/UX Designer', 'Desain interface untuk aplikasi mobile yang user-friendly', NULL, 'Bandung', 1200000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(19, 1, 'Frontend Developer React', 'Developer React untuk membuat dashboard interactive', NULL, 'Bandung', 1300000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(20, 2, 'Content Writer Profesional', 'Menulis artikel berkualitas untuk blog perusahaan kami', NULL, 'Jakarta', 800000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(21, 2, 'Social Media Manager', 'Kelola social media dan buat konten menarik', NULL, 'Jakarta', 900000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(22, 2, 'Graphic Designer Junior', 'Desain grafis untuk kebutuhan marketing dan branding', NULL, 'Jakarta', 700000.00, 'draft', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(23, 3, 'Virtual Assistant', 'Bantu admin dan koordinasi meeting', NULL, 'Surabaya', 600000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(24, 3, 'Data Entry Specialist', 'Input dan verifikasi data dengan akurat', NULL, 'Surabaya', 500000.00, 'aktif', '2026-02-05 05:22:45', '2026-02-05 05:22:45');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lowongan_kategori`
+-- Struktur dari tabel `lowongan_kategori`
 --
 
 CREATE TABLE `lowongan_kategori` (
@@ -271,20 +329,10 @@ CREATE TABLE `lowongan_kategori` (
   `id_kategori` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `lowongan_kategori`
---
-
-INSERT INTO `lowongan_kategori` (`id`, `idLowongan`, `id_kategori`) VALUES
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 3),
-(4, 4, 4);
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `migrations`
+-- Struktur dari tabel `migrations`
 --
 
 CREATE TABLE `migrations` (
@@ -296,7 +344,7 @@ CREATE TABLE `migrations` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `notifikasi`
+-- Struktur dari tabel `notifikasi`
 --
 
 CREATE TABLE `notifikasi` (
@@ -309,19 +357,18 @@ CREATE TABLE `notifikasi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `notifikasi`
+-- Dumping data untuk tabel `notifikasi`
 --
 
 INSERT INTO `notifikasi` (`id_notifikasi`, `idUser`, `tipe_notifikasi`, `pesan`, `is_read`, `created_at`) VALUES
-(1, 5, 'info', 'Selamat! Lamaran Anda telah diterima. Silakan hubungi pemberi kerja untuk detail lebih lanjut.', 0, '2026-02-03 00:54:05'),
-(2, 5, 'info', 'Pekerjaan \'<strong>Front-End Web Dev</strong>\' telah dikonfirmasi selesai. Anda mendapatkan rating!', 0, '2026-02-03 01:38:16'),
-(3, 5, 'rating', 'Anda menerima rating <strong>5 bintang</strong> dari pemberi kerja untuk pekerjaan \'<strong>Front-End Web Dev</strong>\'.', 0, '2026-02-03 02:32:32'),
-(4, 2, 'tolak_lamaran', 'Maaf, lamaran Anda untuk <strong>Butuh Tukang Bangunan untuk Renovasi</strong> di <strong>John Doe</strong> telah ditolak.', 0, '2026-02-03 02:41:33');
+(1, 2, 'rating', 'Anda menerima rating <strong>5 bintang</strong> dari John Doe untuk pekerjaan <strong>Developer Backend PHP</strong>', 0, '2026-02-05 05:22:45'),
+(2, 4, 'rating', 'Anda menerima rating <strong>4 bintang</strong> dari Ahmad Rizki untuk pekerjaan <strong>Content Writer Profesional</strong>', 0, '2026-02-05 05:22:45'),
+(3, 5, 'rating', 'Anda menerima rating <strong>5 bintang</strong> dari John Doe untuk pekerjaan <strong>Developer Backend PHP</strong>', 0, '2026-02-05 05:22:45');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pekerja`
+-- Struktur dari tabel `pekerja`
 --
 
 CREATE TABLE `pekerja` (
@@ -337,18 +384,18 @@ CREATE TABLE `pekerja` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `pekerja`
+-- Dumping data untuk tabel `pekerja`
 --
 
 INSERT INTO `pekerja` (`idPekerja`, `idUser`, `usia`, `keahlian`, `pengalaman`, `alamat`, `no_telp`, `created_at`, `updated_at`) VALUES
-(1, 2, NULL, 'Cleaning, Tukang Bangunan', '3 tahun sebagai pekerja kebersihan', 'Jl. Cibaduyut No. 67, Bandung', '081234567890', '2026-02-01 07:01:14', '2026-02-01 07:01:15'),
+(1, 2, 23, 'Cleaning, Tukang Bangunan', '3 tahun sebagai pekerja kebersihan', 'Jl. Cibaduyut No. 67, Bandung', '081234567890', '2026-02-01 07:01:14', '2026-02-04 22:02:32'),
 (2, 4, NULL, 'Memasak, Mengasuh Anak', '5 tahun sebagai asisten rumah tangga', 'Jl. Buah Batu No. 89, Bandung', '081298765432', '2026-02-01 07:01:14', '2026-02-01 07:01:15'),
-(3, 5, 17, 'Front-End Web Developer,Bongkar PC/Letop (no rakit ulang),Jalan 2 kaki', NULL, 'Jln Batukali no 33', '+62 85759412258', '2026-02-03 05:17:24', '2026-02-03 02:39:46');
+(3, 5, 17, 'Front-End Web Developer,Bongkar PC/Letop (no rakit ulang),Jalan 2 kaki', NULL, 'Jln Batukali no 33', '+62 85759412258', '2026-02-03 05:17:24', '2026-02-04 22:39:58');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pekerjaan`
+-- Struktur dari tabel `pekerjaan`
 --
 
 CREATE TABLE `pekerjaan` (
@@ -362,17 +409,18 @@ CREATE TABLE `pekerjaan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `pekerjaan`
+-- Dumping data untuk tabel `pekerjaan`
 --
 
 INSERT INTO `pekerjaan` (`idPekerjaan`, `idLamaran`, `status_pekerjaan`, `tanggal_mulai`, `tanggal_selesai`, `created_at`, `updated_at`) VALUES
-(1, 3, 'berjalan', '2025-02-02', NULL, '2026-02-01 07:01:15', '2026-02-01 07:01:15'),
-(5, 4, 'selesai', '2026-02-03', '2026-02-03', '2026-02-03 00:54:05', '2026-02-03 02:32:32');
+(1, 1, 'selesai', '2026-01-01', '2026-01-15', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(2, 4, 'selesai', '2026-01-05', '2026-01-20', '2026-02-05 05:22:45', '2026-02-05 05:22:45'),
+(3, 6, 'selesai', '2026-01-10', '2026-01-25', '2026-02-05 05:22:45', '2026-02-05 05:22:45');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pemberikerja`
+-- Struktur dari tabel `pemberikerja`
 --
 
 CREATE TABLE `pemberikerja` (
@@ -386,7 +434,7 @@ CREATE TABLE `pemberikerja` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `pemberikerja`
+-- Dumping data untuk tabel `pemberikerja`
 --
 
 INSERT INTO `pemberikerja` (`idPemberiKerja`, `idUser`, `nama_perusahaan`, `alamat`, `no_telp`, `created_at`, `updated_at`) VALUES
@@ -397,7 +445,7 @@ INSERT INTO `pemberikerja` (`idPemberiKerja`, `idUser`, `nama_perusahaan`, `alam
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pencarian_log`
+-- Struktur dari tabel `pencarian_log`
 --
 
 CREATE TABLE `pencarian_log` (
@@ -411,7 +459,7 @@ CREATE TABLE `pencarian_log` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `rating`
+-- Struktur dari tabel `rating`
 --
 
 CREATE TABLE `rating` (
@@ -424,16 +472,18 @@ CREATE TABLE `rating` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `rating`
+-- Dumping data untuk tabel `rating`
 --
 
 INSERT INTO `rating` (`idRating`, `idPekerjaan`, `nilai_rating`, `ulasan`, `pemberi_rating`, `created_at`) VALUES
-(1, 5, 5, '', 'PemberiKerja', '2026-02-03 02:32:32');
+(1, 1, 5, 'Developer sangat profesional, hasil kode rapi dan tepat waktu. Sangat puas!', 'PemberiKerja', '2026-02-05 05:22:45'),
+(2, 2, 4, 'Konten berkualitas, namun perlu waktu sedikit lebih lama. Overall bagus!', 'PemberiKerja', '2026-02-05 05:22:45'),
+(3, 3, 5, 'Pekerja sangat responsif dan detail oriented. Hasil excellent!', 'PemberiKerja', '2026-02-05 05:22:45');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user`
+-- Struktur dari tabel `user`
 --
 
 CREATE TABLE `user` (
@@ -454,19 +504,19 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `user`
+-- Dumping data untuk tabel `user`
 --
 
 INSERT INTO `user` (`idUser`, `nama`, `username`, `email`, `password`, `jenis_kelamin`, `tipe_user`, `alamat`, `no_hp`, `foto_profil`, `remember_token`, `peran_old`, `created_at`, `updated_at`) VALUES
 (1, 'John Doe', 'john_doe', 'john.pemberi@email.com', '$2y$12$s.wK4Ut4TGXPfa5otQ37gOVqFNTLnGdyJ4jMIpH9xcnIvu3fEDTr.', 'Laki-laki', 'PemberiKerja', NULL, NULL, NULL, NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-01 21:01:17'),
-(2, 'Jane Smith', 'jane_smith', 'jane.pekerja@email.com', '$2y$12$UIi.uxHWSy2iVuLCYIW9vuVUo2zXfpVUKHWk13sf7q4Rd/z51Dhoa', 'Laki-laki', 'Pekerja', NULL, NULL, NULL, NULL, 'Pekerja', '2026-02-01 07:01:14', '2026-02-01 21:38:43'),
-(3, 'Ahmad Rizki', 'ahmad_rizki', 'ahmad@email.com', '$2y$10$sVJTzg.vPZsJ5a5cKHAi1O.mjPUxm4Qre9K.P81yIypESccwpOCrm', 'Laki-laki', 'PemberiKerja', NULL, NULL, NULL, NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-02 03:58:14'),
+(2, 'Jane Smith', 'jane_smith', 'jane.pekerja@email.com', '$2y$12$UIi.uxHWSy2iVuLCYIW9vuVUo2zXfpVUKHWk13sf7q4Rd/z51Dhoa', 'Laki-laki', 'Pekerja', NULL, NULL, 'profil/profil_2_1770260626.png', NULL, 'Pekerja', '2026-02-01 07:01:14', '2026-02-04 22:02:32'),
+(3, 'Ahmad Rizki', 'ahmad_rizki', 'ahmad@email.com', '$2y$12$BZ/SCledyeW7U1XVj9/QLO5f0jdK0Ntp/LYfjUhHmqicILOayWjyq', 'Laki-laki', 'PemberiKerja', NULL, NULL, NULL, NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-04 20:43:35'),
 (4, 'Siti Nurhaliza', 'siti_nurhaliza', 'siti@email.com', '$2y$12$YIUj9NxUQymROmU8xdhIy.i9CPPPcYHAob/LvcpvoQJlU26LZCVJ6', 'Laki-laki', 'Pekerja', NULL, NULL, NULL, NULL, 'Pekerja', '2026-02-01 07:01:14', '2026-02-01 21:05:30'),
-(5, 'Bhadriko Theo Pramudya', 'Bhadriko', 'bhadriko7@gmail.com', '$2y$12$C21P3T97IEoV2Knl2G0UzekHjx7/H6w4nxMW6HV0B833UJUJh2cBK', 'Laki-laki', 'Pekerja', 'Jln Batukali no 33', '085759412258', 'profil/profil_5_1770101740.png', NULL, NULL, '2026-02-02 22:17:24', '2026-02-02 23:56:16'),
+(5, 'Bhadriko Theo Pramudya', 'Bhadriko', 'bhadriko7@gmail.com', '$2y$12$C21P3T97IEoV2Knl2G0UzekHjx7/H6w4nxMW6HV0B833UJUJh2cBK', 'Laki-laki', 'Pekerja', 'Jln Batukali no 33', '085759412258', 'profil/profil_5_1770269999.png', NULL, NULL, '2026-02-02 22:17:24', '2026-02-04 22:39:59'),
 (6, 'Pramudya', 'bayangan_gwehhh', 'bhariko7@gmail.com', '$2y$12$UOVf1RJHsHxnaUYQIcces.1Z8Ckgm1RirK2hfLkbPLzcVaUeVjjHa', 'Laki-laki', 'PemberiKerja', 'Jalan jalan', '085759412258', NULL, NULL, NULL, '2026-02-02 22:57:09', '2026-02-02 22:57:09');
 
 --
--- Triggers `user`
+-- Trigger `user`
 --
 DELIMITER $$
 CREATE TRIGGER `after_user_insert` AFTER INSERT ON `user` FOR EACH ROW BEGIN
@@ -484,8 +534,8 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `v_lamaran_detail`
--- (See below for the actual view)
+-- Stand-in struktur untuk tampilan `v_lamaran_detail`
+-- (Lihat di bawah untuk tampilan aktual)
 --
 CREATE TABLE `v_lamaran_detail` (
 `idLamaran` int(11)
@@ -509,8 +559,8 @@ CREATE TABLE `v_lamaran_detail` (
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `v_lowongan_detail`
--- (See below for the actual view)
+-- Stand-in struktur untuk tampilan `v_lowongan_detail`
+-- (Lihat di bawah untuk tampilan aktual)
 --
 CREATE TABLE `v_lowongan_detail` (
 `idLowongan` int(11)
@@ -534,8 +584,8 @@ CREATE TABLE `v_lowongan_detail` (
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `v_rating_pekerja`
--- (See below for the actual view)
+-- Stand-in struktur untuk tampilan `v_rating_pekerja`
+-- (Lihat di bawah untuk tampilan aktual)
 --
 CREATE TABLE `v_rating_pekerja` (
 `idPekerja` int(11)
@@ -547,8 +597,8 @@ CREATE TABLE `v_rating_pekerja` (
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `v_rating_pemberi_kerja`
--- (See below for the actual view)
+-- Stand-in struktur untuk tampilan `v_rating_pemberi_kerja`
+-- (Lihat di bawah untuk tampilan aktual)
 --
 CREATE TABLE `v_rating_pemberi_kerja` (
 `idPemberiKerja` int(11)
@@ -560,7 +610,7 @@ CREATE TABLE `v_rating_pemberi_kerja` (
 -- --------------------------------------------------------
 
 --
--- Structure for view `v_lamaran_detail`
+-- Struktur untuk view `v_lamaran_detail`
 --
 DROP TABLE IF EXISTS `v_lamaran_detail`;
 
@@ -569,7 +619,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure for view `v_lowongan_detail`
+-- Struktur untuk view `v_lowongan_detail`
 --
 DROP TABLE IF EXISTS `v_lowongan_detail`;
 
@@ -578,7 +628,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure for view `v_rating_pekerja`
+-- Struktur untuk view `v_rating_pekerja`
 --
 DROP TABLE IF EXISTS `v_rating_pekerja`;
 
@@ -587,7 +637,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure for view `v_rating_pemberi_kerja`
+-- Struktur untuk view `v_rating_pemberi_kerja`
 --
 DROP TABLE IF EXISTS `v_rating_pemberi_kerja`;
 
@@ -598,7 +648,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 
 --
--- Indexes for table `activity_log`
+-- Indeks untuk tabel `activity_log`
 --
 ALTER TABLE `activity_log`
   ADD PRIMARY KEY (`id_log`),
@@ -606,7 +656,7 @@ ALTER TABLE `activity_log`
   ADD KEY `idx_created_at` (`created_at`);
 
 --
--- Indexes for table `chat_conversation`
+-- Indeks untuk tabel `chat_conversation`
 --
 ALTER TABLE `chat_conversation`
   ADD PRIMARY KEY (`id_conversation`),
@@ -615,7 +665,7 @@ ALTER TABLE `chat_conversation`
   ADD KEY `idLowongan` (`idLowongan`);
 
 --
--- Indexes for table `chat_message`
+-- Indeks untuk tabel `chat_message`
 --
 ALTER TABLE `chat_message`
   ADD PRIMARY KEY (`id_message`),
@@ -624,7 +674,7 @@ ALTER TABLE `chat_message`
   ADD KEY `idx_created_at` (`created_at`);
 
 --
--- Indexes for table `favorit`
+-- Indeks untuk tabel `favorit`
 --
 ALTER TABLE `favorit`
   ADD PRIMARY KEY (`id_favorit`),
@@ -632,13 +682,13 @@ ALTER TABLE `favorit`
   ADD KEY `idLowongan` (`idLowongan`);
 
 --
--- Indexes for table `kategori`
+-- Indeks untuk tabel `kategori`
 --
 ALTER TABLE `kategori`
   ADD PRIMARY KEY (`id_kategori`);
 
 --
--- Indexes for table `lamaran`
+-- Indeks untuk tabel `lamaran`
 --
 ALTER TABLE `lamaran`
   ADD PRIMARY KEY (`idLamaran`),
@@ -648,7 +698,7 @@ ALTER TABLE `lamaran`
   ADD KEY `idx_tanggal` (`tanggal_lamaran`);
 
 --
--- Indexes for table `lowongan`
+-- Indeks untuk tabel `lowongan`
 --
 ALTER TABLE `lowongan`
   ADD PRIMARY KEY (`idLowongan`),
@@ -658,7 +708,7 @@ ALTER TABLE `lowongan`
   ADD KEY `idx_created_at` (`created_at`);
 
 --
--- Indexes for table `lowongan_kategori`
+-- Indeks untuk tabel `lowongan_kategori`
 --
 ALTER TABLE `lowongan_kategori`
   ADD PRIMARY KEY (`id`),
@@ -666,13 +716,13 @@ ALTER TABLE `lowongan_kategori`
   ADD KEY `id_kategori` (`id_kategori`);
 
 --
--- Indexes for table `migrations`
+-- Indeks untuk tabel `migrations`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `notifikasi`
+-- Indeks untuk tabel `notifikasi`
 --
 ALTER TABLE `notifikasi`
   ADD PRIMARY KEY (`id_notifikasi`),
@@ -680,14 +730,14 @@ ALTER TABLE `notifikasi`
   ADD KEY `idx_created_at` (`created_at`);
 
 --
--- Indexes for table `pekerja`
+-- Indeks untuk tabel `pekerja`
 --
 ALTER TABLE `pekerja`
   ADD PRIMARY KEY (`idPekerja`),
   ADD UNIQUE KEY `unique_user_pekerja` (`idUser`);
 
 --
--- Indexes for table `pekerjaan`
+-- Indeks untuk tabel `pekerjaan`
 --
 ALTER TABLE `pekerjaan`
   ADD PRIMARY KEY (`idPekerjaan`),
@@ -695,14 +745,14 @@ ALTER TABLE `pekerjaan`
   ADD KEY `idx_status` (`status_pekerjaan`);
 
 --
--- Indexes for table `pemberikerja`
+-- Indeks untuk tabel `pemberikerja`
 --
 ALTER TABLE `pemberikerja`
   ADD PRIMARY KEY (`idPemberiKerja`),
   ADD UNIQUE KEY `unique_user_pemberi` (`idUser`);
 
 --
--- Indexes for table `pencarian_log`
+-- Indeks untuk tabel `pencarian_log`
 --
 ALTER TABLE `pencarian_log`
   ADD PRIMARY KEY (`id_pencarian`),
@@ -711,7 +761,7 @@ ALTER TABLE `pencarian_log`
   ADD KEY `idx_created_at` (`created_at`);
 
 --
--- Indexes for table `rating`
+-- Indeks untuk tabel `rating`
 --
 ALTER TABLE `rating`
   ADD PRIMARY KEY (`idRating`),
@@ -720,7 +770,7 @@ ALTER TABLE `rating`
   ADD KEY `idx_pemberi` (`pemberi_rating`);
 
 --
--- Indexes for table `user`
+-- Indeks untuk tabel `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`idUser`),
@@ -730,117 +780,117 @@ ALTER TABLE `user`
   ADD KEY `idx_peran` (`peran_old`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
 --
--- AUTO_INCREMENT for table `activity_log`
+-- AUTO_INCREMENT untuk tabel `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
--- AUTO_INCREMENT for table `chat_conversation`
+-- AUTO_INCREMENT untuk tabel `chat_conversation`
 --
 ALTER TABLE `chat_conversation`
   MODIFY `id_conversation` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `chat_message`
+-- AUTO_INCREMENT untuk tabel `chat_message`
 --
 ALTER TABLE `chat_message`
   MODIFY `id_message` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `favorit`
+-- AUTO_INCREMENT untuk tabel `favorit`
 --
 ALTER TABLE `favorit`
   MODIFY `id_favorit` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `kategori`
+-- AUTO_INCREMENT untuk tabel `kategori`
 --
 ALTER TABLE `kategori`
   MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT for table `lamaran`
+-- AUTO_INCREMENT untuk tabel `lamaran`
 --
 ALTER TABLE `lamaran`
-  MODIFY `idLamaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `idLamaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `lowongan`
+-- AUTO_INCREMENT untuk tabel `lowongan`
 --
 ALTER TABLE `lowongan`
-  MODIFY `idLowongan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idLowongan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT for table `lowongan_kategori`
+-- AUTO_INCREMENT untuk tabel `lowongan_kategori`
 --
 ALTER TABLE `lowongan_kategori`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `migrations`
+-- AUTO_INCREMENT untuk tabel `migrations`
 --
 ALTER TABLE `migrations`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `notifikasi`
+-- AUTO_INCREMENT untuk tabel `notifikasi`
 --
 ALTER TABLE `notifikasi`
-  MODIFY `id_notifikasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_notifikasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `pekerja`
+-- AUTO_INCREMENT untuk tabel `pekerja`
 --
 ALTER TABLE `pekerja`
   MODIFY `idPekerja` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `pekerjaan`
+-- AUTO_INCREMENT untuk tabel `pekerjaan`
 --
 ALTER TABLE `pekerjaan`
-  MODIFY `idPekerjaan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idPekerjaan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `pemberikerja`
+-- AUTO_INCREMENT untuk tabel `pemberikerja`
 --
 ALTER TABLE `pemberikerja`
-  MODIFY `idPemberiKerja` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idPemberiKerja` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `pencarian_log`
+-- AUTO_INCREMENT untuk tabel `pencarian_log`
 --
 ALTER TABLE `pencarian_log`
   MODIFY `id_pencarian` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `rating`
+-- AUTO_INCREMENT untuk tabel `rating`
 --
 ALTER TABLE `rating`
-  MODIFY `idRating` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idRating` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `user`
+-- AUTO_INCREMENT untuk tabel `user`
 --
 ALTER TABLE `user`
   MODIFY `idUser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- Constraints for dumped tables
+-- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
 --
 
 --
--- Constraints for table `activity_log`
+-- Ketidakleluasaan untuk tabel `activity_log`
 --
 ALTER TABLE `activity_log`
   ADD CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`) ON DELETE SET NULL;
 
 --
--- Constraints for table `chat_conversation`
+-- Ketidakleluasaan untuk tabel `chat_conversation`
 --
 ALTER TABLE `chat_conversation`
   ADD CONSTRAINT `chat_conversation_ibfk_1` FOREIGN KEY (`idPekerja`) REFERENCES `pekerja` (`idPekerja`) ON DELETE CASCADE,
@@ -848,71 +898,71 @@ ALTER TABLE `chat_conversation`
   ADD CONSTRAINT `chat_conversation_ibfk_3` FOREIGN KEY (`idLowongan`) REFERENCES `lowongan` (`idLowongan`) ON DELETE SET NULL;
 
 --
--- Constraints for table `chat_message`
+-- Ketidakleluasaan untuk tabel `chat_message`
 --
 ALTER TABLE `chat_message`
   ADD CONSTRAINT `chat_message_ibfk_1` FOREIGN KEY (`id_conversation`) REFERENCES `chat_conversation` (`id_conversation`) ON DELETE CASCADE,
   ADD CONSTRAINT `chat_message_ibfk_2` FOREIGN KEY (`id_sender`) REFERENCES `user` (`idUser`) ON DELETE CASCADE;
 
 --
--- Constraints for table `favorit`
+-- Ketidakleluasaan untuk tabel `favorit`
 --
 ALTER TABLE `favorit`
   ADD CONSTRAINT `favorit_ibfk_1` FOREIGN KEY (`idPekerja`) REFERENCES `pekerja` (`idPekerja`) ON DELETE CASCADE,
   ADD CONSTRAINT `favorit_ibfk_2` FOREIGN KEY (`idLowongan`) REFERENCES `lowongan` (`idLowongan`) ON DELETE CASCADE;
 
 --
--- Constraints for table `lamaran`
+-- Ketidakleluasaan untuk tabel `lamaran`
 --
 ALTER TABLE `lamaran`
   ADD CONSTRAINT `lamaran_ibfk_1` FOREIGN KEY (`idLowongan`) REFERENCES `lowongan` (`idLowongan`) ON DELETE CASCADE,
   ADD CONSTRAINT `lamaran_ibfk_2` FOREIGN KEY (`idPekerja`) REFERENCES `pekerja` (`idPekerja`) ON DELETE CASCADE;
 
 --
--- Constraints for table `lowongan`
+-- Ketidakleluasaan untuk tabel `lowongan`
 --
 ALTER TABLE `lowongan`
   ADD CONSTRAINT `lowongan_ibfk_1` FOREIGN KEY (`idPemberiKerja`) REFERENCES `pemberikerja` (`idPemberiKerja`) ON DELETE CASCADE;
 
 --
--- Constraints for table `lowongan_kategori`
+-- Ketidakleluasaan untuk tabel `lowongan_kategori`
 --
 ALTER TABLE `lowongan_kategori`
   ADD CONSTRAINT `lowongan_kategori_ibfk_1` FOREIGN KEY (`idLowongan`) REFERENCES `lowongan` (`idLowongan`) ON DELETE CASCADE,
   ADD CONSTRAINT `lowongan_kategori_ibfk_2` FOREIGN KEY (`id_kategori`) REFERENCES `kategori` (`id_kategori`) ON DELETE CASCADE;
 
 --
--- Constraints for table `notifikasi`
+-- Ketidakleluasaan untuk tabel `notifikasi`
 --
 ALTER TABLE `notifikasi`
   ADD CONSTRAINT `notifikasi_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`) ON DELETE CASCADE;
 
 --
--- Constraints for table `pekerja`
+-- Ketidakleluasaan untuk tabel `pekerja`
 --
 ALTER TABLE `pekerja`
   ADD CONSTRAINT `pekerja_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`) ON DELETE CASCADE;
 
 --
--- Constraints for table `pekerjaan`
+-- Ketidakleluasaan untuk tabel `pekerjaan`
 --
 ALTER TABLE `pekerjaan`
   ADD CONSTRAINT `pekerjaan_ibfk_1` FOREIGN KEY (`idLamaran`) REFERENCES `lamaran` (`idLamaran`) ON DELETE CASCADE;
 
 --
--- Constraints for table `pemberikerja`
+-- Ketidakleluasaan untuk tabel `pemberikerja`
 --
 ALTER TABLE `pemberikerja`
   ADD CONSTRAINT `pemberikerja_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`) ON DELETE CASCADE;
 
 --
--- Constraints for table `pencarian_log`
+-- Ketidakleluasaan untuk tabel `pencarian_log`
 --
 ALTER TABLE `pencarian_log`
   ADD CONSTRAINT `pencarian_log_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`) ON DELETE SET NULL;
 
 --
--- Constraints for table `rating`
+-- Ketidakleluasaan untuk tabel `rating`
 --
 ALTER TABLE `rating`
   ADD CONSTRAINT `rating_ibfk_1` FOREIGN KEY (`idPekerjaan`) REFERENCES `pekerjaan` (`idPekerjaan`) ON DELETE CASCADE;
