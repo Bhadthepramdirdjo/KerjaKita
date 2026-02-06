@@ -327,19 +327,21 @@
 
         // Confirm logout (nanti akan redirect ke logout route)
         confirmLogout.addEventListener('click', () => {
-            // Create form untuk submit POST request
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = "{{ route('logout') }}";
+            // Buat form untuk submit POST logout
+            const logoutForm = document.createElement('form');
+            logoutForm.method = 'POST';
+            logoutForm.action = '{{ route("logout") }}';
 
-            const token = document.createElement('input');
-            token.type = 'hidden';
-            token.name = '_token';
-            token.value = "{{ csrf_token() }}";
+            // Tambahkan CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
 
-            form.appendChild(token);
-            document.body.appendChild(form);
-            form.submit();
+            logoutForm.appendChild(csrfToken);
+            document.body.appendChild(logoutForm);
+            logoutForm.submit();
+>>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
         });
 
         // Close modal when clicking backdrop

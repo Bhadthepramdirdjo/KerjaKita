@@ -58,6 +58,10 @@
             margin-bottom: 0;
         }
 
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
         .form-label {
             display: block;
             color: #374151;
@@ -212,6 +216,12 @@
             </div>
         @endif
 
+        @if (session('success'))
+            <div style="background: #d1fae5; color: #065f46; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 11px;">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <form action="{{ route('register.post') }}" method="POST">
             @csrf
 
@@ -247,6 +257,37 @@
                 </div>
 
                 <div class="form-group">
+<<<<<<< HEAD
+=======
+                    <label class="form-label">No HP</label>
+                    <input
+                        type="text"
+                        name="no_hp"
+                        class="form-input"
+                        placeholder="No HP"
+                        value="{{ old('no_hp') }}"
+                    >
+                    @error('no_hp')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">Alamat Lengkap</label>
+                    <input
+                        type="text"
+                        name="alamat"
+                        class="form-input"
+                        placeholder="Alamat"
+                        value="{{ old('alamat') }}"
+                    >
+                    @error('alamat')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+>>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
                     <label class="form-label">Password</label>
                     <input
                         type="password"
@@ -262,6 +303,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Konfirmasi Password</label>
+<<<<<<< HEAD
                     <input
                         type="password"
                         name="password_confirmation"
@@ -290,12 +332,14 @@
 
                 <div class="form-group">
                     <label class="form-label">No Hp</label>
+=======
+>>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
                     <input
-                        type="text"
-                        name="no_hp"
+                        type="password"
+                        name="password_confirmation"
                         class="form-input"
-                        placeholder="No Hp"
-                        value="{{ old('no_hp') }}"
+                        placeholder="Konfirmasi Password"
+                        required
                     >
                 </div>
             </div>
@@ -311,6 +355,7 @@
                                 name="jenis_kelamin"
                                 value="Laki-laki"
                                 {{ old('jenis_kelamin') == 'Laki-laki' ? 'checked' : '' }}
+                                required
                             >
                             <label for="laki">Laki Laki</label>
                         </div>
@@ -325,6 +370,9 @@
                             <label for="perempuan">Perempuan</label>
                         </div>
                     </div>
+                    @error('jenis_kelamin')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="radio-section">
@@ -352,6 +400,9 @@
                             <label for="pencari">Pencari Kerja</label>
                         </div>
                     </div>
+                    @error('tipe_user')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
@@ -359,7 +410,11 @@
                 Daftar sekarang
             </button>
 
+<<<<<<< HEAD
             <a href="{{ url('/') }}" class="back-btn">
+=======
+            <a href="{{ route('home') }}" class="back-btn">
+>>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
                 Kembali ke Dashboard
             </a>
         </form>

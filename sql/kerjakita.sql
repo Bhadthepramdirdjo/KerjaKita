@@ -3,9 +3,12 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 02, 2026 at 06:16 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+
+=======
+-- Waktu pembuatan: 02 Feb 2026 pada 06.52
+-- Versi server: 10.4.32-MariaDB
+-- Versi PHP: 8.2.12
+>>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -78,6 +81,32 @@ CREATE TABLE `activity_log` (
   `ip_address` varchar(45) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `activity_log`
+--
+
+INSERT INTO `activity_log` (`id_log`, `idUser`, `activity_type`, `description`, `ip_address`, `created_at`) VALUES
+(1, NULL, 'login_failed', 'Gagal login dengan username: john.pemberi@email.com', '127.0.0.1', '2026-02-01 21:00:12'),
+(2, NULL, 'login_failed', 'Gagal login dengan username: john.pemberi@email.com', '127.0.0.1', '2026-02-01 21:00:32'),
+(3, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 21:01:17'),
+(4, 4, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 21:05:30'),
+(5, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 21:38:14'),
+(6, 2, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 21:38:43'),
+(7, 2, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 21:43:25'),
+(8, 2, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 21:43:38'),
+(9, 2, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 21:43:48'),
+(10, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 21:43:56'),
+(11, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 22:03:38'),
+(12, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 22:03:49'),
+(13, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 22:16:37'),
+(14, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 22:16:46'),
+(15, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 22:34:43'),
+(16, 4, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 22:35:20'),
+(17, 4, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 22:39:56'),
+(18, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 22:40:10'),
+(19, 1, 'logout', 'User logout dari sistem', '127.0.0.1', '2026-02-01 22:43:15'),
+(20, 1, 'login', 'User login ke sistem', '127.0.0.1', '2026-02-01 22:43:30');
 
 -- --------------------------------------------------------
 
@@ -363,9 +392,16 @@ CREATE TABLE `rating` (
 CREATE TABLE `user` (
   `idUser` int(11) NOT NULL,
   `nama` varchar(255) NOT NULL,
+  `username` varchar(100) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `peran` varchar(50) NOT NULL,
+  `jenis_kelamin` enum('Laki-laki','Perempuan') DEFAULT NULL,
+  `tipe_user` enum('Pekerja','PemberiKerja') NOT NULL,
+  `alamat` text DEFAULT NULL,
+  `no_hp` varchar(20) DEFAULT NULL,
+  `foto_profil` text DEFAULT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
+  `peran_old` varchar(50) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -374,21 +410,23 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`idUser`, `nama`, `email`, `password`, `peran`, `created_at`, `updated_at`) VALUES
-(1, 'John Doe', 'john.pemberi@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-01 07:01:14'),
-(2, 'Jane Smith', 'jane.pekerja@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Pekerja', '2026-02-01 07:01:14', '2026-02-01 07:01:14'),
-(3, 'Ahmad Rizki', 'ahmad@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-01 07:01:14'),
-(4, 'Siti Nurhaliza', 'siti@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Pekerja', '2026-02-01 07:01:14', '2026-02-01 07:01:14');
+INSERT INTO `user` (`idUser`, `nama`, `username`, `email`, `password`, `jenis_kelamin`, `tipe_user`, `alamat`, `no_hp`, `foto_profil`, `remember_token`, `peran_old`, `created_at`, `updated_at`) VALUES
+(1, 'John Doe', 'john_doe', 'john.pemberi@email.com', '$2y$12$s.wK4Ut4TGXPfa5otQ37gOVqFNTLnGdyJ4jMIpH9xcnIvu3fEDTr.', 'Laki-laki', 'PemberiKerja', NULL, NULL, NULL, NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-01 21:01:17'),
+(2, 'Jane Smith', 'jane_smith', 'jane.pekerja@email.com', '$2y$12$UIi.uxHWSy2iVuLCYIW9vuVUo2zXfpVUKHWk13sf7q4Rd/z51Dhoa', 'Laki-laki', 'Pekerja', NULL, NULL, NULL, NULL, 'Pekerja', '2026-02-01 07:01:14', '2026-02-01 21:38:43'),
+(3, 'Ahmad Rizki', 'ahmad_rizki', 'ahmad@email.com', '$2y$10$sVJTzg.vPZsJ5a5cKHAi1O.mjPUxm4Qre9K.P81yIypESccwpOCrm', 'Laki-laki', 'PemberiKerja', NULL, NULL, NULL, NULL, 'PemberiKerja', '2026-02-01 07:01:14', '2026-02-02 03:58:14'),
+(4, 'Siti Nurhaliza', 'siti_nurhaliza', 'siti@email.com', '$2y$12$YIUj9NxUQymROmU8xdhIy.i9CPPPcYHAob/LvcpvoQJlU26LZCVJ6', 'Laki-laki', 'Pekerja', NULL, NULL, NULL, NULL, 'Pekerja', '2026-02-01 07:01:14', '2026-02-01 21:05:30');
 
 --
 -- Triggers `user`
 --
 DELIMITER $$
 CREATE TRIGGER `after_user_insert` AFTER INSERT ON `user` FOR EACH ROW BEGIN
-    IF NEW.peran = 'PemberiKerja' THEN
-        INSERT INTO PemberiKerja (idUser) VALUES (NEW.idUser);
-    ELSEIF NEW.peran = 'Pekerja' THEN
-        INSERT INTO Pekerja (idUser) VALUES (NEW.idUser);
+    IF NEW.tipe_user = 'PemberiKerja' THEN
+        INSERT INTO PemberiKerja (idUser, nama_perusahaan, created_at, updated_at)
+        VALUES (NEW.idUser, NEW.nama, NOW(), NOW());
+    ELSEIF NEW.tipe_user = 'Pekerja' THEN
+        INSERT INTO Pekerja (idUser, created_at, updated_at)
+        VALUES (NEW.idUser, NOW(), NOW());
     END IF;
 END
 $$
@@ -632,8 +670,9 @@ ALTER TABLE `rating`
 ALTER TABLE `user`
   ADD PRIMARY KEY (`idUser`),
   ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `username` (`username`),
   ADD KEY `idx_email` (`email`),
-  ADD KEY `idx_peran` (`peran`);
+  ADD KEY `idx_peran` (`peran_old`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -643,7 +682,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `chat_conversation`

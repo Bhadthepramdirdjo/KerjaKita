@@ -53,6 +53,37 @@
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
         }
+
+        /* Notifikasi Dropdown Animation */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-dropdown {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        /* Notifikasi Item */
+        .notification-item {
+            border-left: 4px solid #289FB7;
+            transition: all 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #E8FBFF;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-item.unread {
+            background-color: #F0FAFB;
+        }
     </style>
 </head>
 <body class="text-keel-black h-screen flex overflow-hidden">
@@ -185,6 +216,16 @@
                 </button>
             </div>
 
+            <!-- Notifikasi Bell -->
+            <button id="notificationBtn" class="relative w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center bg-white hover:bg-gray-50 flex-shrink-0">
+                <i class="fas fa-bell text-2xl text-keel-black"></i>
+                @if(count($notifikasi) > 0)
+                    <span class="absolute top-2 right-2 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                        {{ count($notifikasi) }}
+                    </span>
+                @endif
+            </button>
+
             <!-- Profile Icon -->
             <button class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
                 <i class="far fa-user text-2xl text-keel-black"></i>
@@ -274,7 +315,97 @@
             filterSidebar.classList.add('-translate-x-full');
             filterOverlay.classList.add('hidden');
         });
+
+        // Notification Dropdown
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+
+        notificationBtn.addEventListener('click', () => {
+            notificationDropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#notificationBtn') && !e.target.closest('#notificationDropdown')) {
+                notificationDropdown.classList.add('hidden');
+            }
+        });
+
+        // Mark notification as read
+        function markNotificationAsRead(notificationId) {
+            const item = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            if (item) {
+                item.classList.remove('unread');
+            }
+        }
     </script>
+
+    <!-- Notification Dropdown -->
+    <div id="notificationDropdown" class="hidden fixed top-20 right-8 w-80 bg-white rounded-2xl shadow-2xl z-50 notification-dropdown max-h-96 overflow-y-auto">
+        <!-- Header -->
+        <div class="sticky top-0 bg-gradient-to-r from-pelagic-blue to-shallow-reef px-6 py-4 rounded-t-2xl">
+            <h3 class="text-lg font-bold text-white">Notifikasi</h3>
+            <p class="text-white text-opacity-90 text-xs mt-1">Pembaruan terbaru dari sistem</p>
+        </div>
+
+        <!-- Notifikasi List -->
+        <div class="divide-y divide-gray-200">
+            @forelse($notifikasi as $notif)
+                <div class="notification-item p-4 {{ !$notif->is_read ? 'unread' : '' }}" data-notification-id="{{ $notif->idNotifikasi }}">
+                    <!-- Header Notifikasi -->
+                    <div class="flex items-start gap-3 mb-2">
+                        @if($notif->tipe_notifikasi == 'rating')
+                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-star text-yellow-500 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-keel-black text-sm">Anda Mendapat Rating</p>
+                            </div>
+                        @elseif($notif->tipe_notifikasi == 'terima_lamaran')
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-green-500 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-keel-black text-sm">Lamaran Diterima</p>
+                            </div>
+                        @elseif($notif->tipe_notifikasi == 'tolak_lamaran')
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-times text-red-500 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-keel-black text-sm">Lamaran Ditolak</p>
+                            </div>
+                        @else
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-bell text-pelagic-blue text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-keel-black text-sm">Pemberitahuan</p>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Message -->
+                    <p class="text-gray-700 text-sm leading-relaxed ml-13">
+                        {{ $notif->pesan }}
+                    </p>
+
+                    <!-- Timestamp -->
+                    <p class="text-gray-500 text-xs mt-2 ml-13">
+                        {{ $notif->created_at ? \Carbon\Carbon::parse($notif->created_at)->diffForHumans() : 'Baru-baru ini' }}
+                    </p>
+                </div>
+            @empty
+                <div class="p-8 text-center">
+                    <div class="inline-block p-3 rounded-full bg-gray-100 mb-3">
+                        <i class="fas fa-inbox text-3xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-500 font-medium">Tidak ada notifikasi</p>
+                    <p class="text-gray-400 text-xs mt-1">Notifikasi baru akan muncul di sini</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
 
 </body>
 </html>

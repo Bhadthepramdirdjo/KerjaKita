@@ -67,6 +67,37 @@
             border-color: #146B8C;
             background-color: #e0f7ff;
         }
+
+        /* Modal animation styles */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOutDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .modal-animation {
+            animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-animation-out {
+            animation: slideOutDown 0.3s ease-in-out;
+        }
     </style>
 </head>
 <body class="text-keel-black h-screen flex overflow-hidden">
@@ -125,8 +156,9 @@
         <!-- Scrollable Content Area -->
         <div class="flex-1 overflow-y-auto no-scrollbar px-4 sm:px-8 py-6">
             
-            <form action="{{ route('pemberi-kerja.simpan-lowongan') }}" method="POST" enctype="multipart/form-data" class="max-w-5xl mx-auto">
+            <form action="{{ route('pemberi-kerja.simpan-lowongan') }}" method="POST" enctype="multipart/form-data" class="max-w-5xl mx-auto" id="lowonganForm">
                 @csrf
+                <input type="hidden" name="status" id="statusInput" value="aktif">
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     
@@ -172,7 +204,7 @@
                             </label>
                             <div class="space-y-3">
                                 <label class="flex items-center p-3 rounded-xl hover:bg-seafoam-bloom hover:bg-opacity-20 cursor-pointer transition-colors">
-                                    <input type="radio" name="jenis_pekerjaan" value="onsite" required class="w-5 h-5 text-pelagic-blue focus:ring-pelagic-blue">
+                                    <input type="radio" name="jenis_pekerjaan" value="on-site" required class="w-5 h-5 text-pelagic-blue focus:ring-pelagic-blue">
                                     <span class="ml-3 text-gray-700">On-site (langsung di lokasi)</span>
                                 </label>
                                 <label class="flex items-center p-3 rounded-xl hover:bg-seafoam-bloom hover:bg-opacity-20 cursor-pointer transition-colors">
@@ -245,7 +277,7 @@
                                 Durasi Kerja <span class="text-red-500">*</span>
                             </label>
                             <select 
-                                name="durasi_kerja" 
+                                name="durasi" 
                                 required
                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pelagic-blue focus:border-transparent bg-white">
                                 <option value="">Pilih Durasi</option>
@@ -301,7 +333,7 @@
                                 </span>
                                 <input 
                                     type="tel" 
-                                    name="no_telp" 
+                                    name="nomor_telepon" 
                                     placeholder="+62 123654789874"
                                     required
                                     class="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pelagic-blue focus:border-transparent">
@@ -405,9 +437,9 @@
         <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"></div>
         
         <!-- Modal Content -->
-        <div class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+        <div id="suksesModalContent" class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all modal-animation">
             <!-- Icon Success -->
-            <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+            <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4 animate-bounce">
                 <i class="fas fa-check text-4xl text-green-600"></i>
             </div>
             
@@ -514,12 +546,15 @@
         const draftBtn = document.getElementById('draftBtn');
         const konfirmasiModal = document.getElementById('konfirmasiModal');
         const suksesModal = document.getElementById('suksesModal');
+        const suksesModalContent = document.getElementById('suksesModalContent');
         const cancelKonfirmasi = document.getElementById('cancelKonfirmasi');
         const confirmAction = document.getElementById('confirmAction');
         const okeSukses = document.getElementById('okeSukses');
         const modalActionText = document.getElementById('modalActionText');
         const suksesTitle = document.getElementById('suksesTitle');
         const suksesMessage = document.getElementById('suksesMessage');
+        const statusInput = document.getElementById('statusInput');
+        const lowonganForm = document.getElementById('lowonganForm');
 
         let currentAction = '';
 
@@ -539,12 +574,19 @@
             suksesTitle.textContent = 'Draft berhasil disimpan';
             suksesMessage.innerHTML = 'Lowongan pekerjaan Anda telah disimpan sebagai draft.<br><br>Anda dapat melanjutkan atau mempublikasikannya nanti.';
             
-            // Langsung show sukses modal
+            // Set status to draft
+            statusInput.value = 'draft';
+            
+            // Show sukses modal dengan animasi
             suksesModal.classList.remove('hidden');
             suksesModal.classList.add('flex');
+            suksesModalContent.classList.remove('modal-animation-out');
+            suksesModalContent.classList.add('modal-animation');
             
-            // TODO: Submit form ke backend
-            // document.querySelector('form').submit();
+            // Submit form after showing modal
+            setTimeout(() => {
+                lowonganForm.submit();
+            }, 800);
         });
 
         // Cancel konfirmasi
@@ -563,26 +605,41 @@
             if (currentAction === 'publish') {
                 suksesTitle.textContent = 'Pekerjaan berhasil di publikasi';
                 suksesMessage.innerHTML = 'Terimakasih sudah menyediakan Lapangan Kerja seperti yang dijanjikan oleh <span class="font-bold text-pelagic-blue">presiden Prabowo</span>.<br><br>Jangan lupa berikan upah kepada pekerja';
+                
+                // Set status to publish
+                statusInput.value = 'aktif';
             } else {
                 suksesTitle.textContent = 'Draft berhasil disimpan';
                 suksesMessage.innerHTML = 'Lowongan pekerjaan Anda telah disimpan sebagai draft.<br><br>Anda dapat melanjutkan atau mempublikasikannya nanti.';
+                
+                // Set status to draft
+                statusInput.value = 'draft';
             }
 
-            // Show sukses modal
+            // Show sukses modal dengan animasi
             suksesModal.classList.remove('hidden');
             suksesModal.classList.add('flex');
+            suksesModalContent.classList.remove('modal-animation-out');
+            suksesModalContent.classList.add('modal-animation');
 
-            // TODO: Submit form ke backend
-            // document.querySelector('form').submit();
+            // Submit form after showing modal
+            setTimeout(() => {
+                lowonganForm.submit();
+            }, 800);
         });
 
         // OKE button on sukses modal
         okeSukses.addEventListener('click', () => {
-            suksesModal.classList.add('hidden');
-            suksesModal.classList.remove('flex');
+            suksesModalContent.classList.remove('modal-animation');
+            suksesModalContent.classList.add('modal-animation-out');
             
-            // Redirect to dashboard
-            window.location.href = "{{ route('pemberi-kerja.dashboard') }}";
+            setTimeout(() => {
+                suksesModal.classList.add('hidden');
+                suksesModal.classList.remove('flex');
+                
+                // Redirect to lowongan-saya
+                window.location.href = "{{ route('pemberi-kerja.lowongan-saya') }}";
+            }, 300);
         });
 
         // Close modal when clicking backdrop
