@@ -9,6 +9,7 @@ use App\Http\Controllers\LowonganController;
 use App\Http\Controllers\LamaranController;
 use App\Http\Controllers\PekerjaanController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\NotifikasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,13 +42,16 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
     
     // Pemberi Kerja Routes
-    Route::prefix('pemberi-kerja')->name('pemberi-kerja.')->group(function () {
+    Route::prefix('pemberi-kerja')->name('pemberi-kerja.')->middleware('pemberi_kerja')->group(function () {
         Route::get('/dashboard', [PemberiKerjaController::class, 'dashboard'])->name('dashboard');
         Route::get('/pengaturan', [PemberiKerjaController::class, 'pengaturan'])->name('pengaturan');
+        Route::get('/profil', [PemberiKerjaController::class, 'profil'])->name('profil');
+        Route::put('/profil', [PemberiKerjaController::class, 'updateProfil'])->name('profil.update');
         Route::get('/buat-lowongan', [PemberiKerjaController::class, 'buatLowongan'])->name('buat-lowongan');
         Route::post('/simpan-lowongan', [PemberiKerjaController::class, 'simpanLowongan'])->name('simpan-lowongan');
         Route::get('/rekomendasi-pekerja', [PemberiKerjaController::class, 'rekomendasiPekerja'])->name('rekomendasi-pekerja');
         Route::get('/lowongan-saya', [PemberiKerjaController::class, 'lowonganSaya'])->name('lowongan-saya');
+        Route::post('/lowongan/{id}/publikasi', [PemberiKerjaController::class, 'publikasiDraft'])->name('lowongan.publikasi');
         Route::get('/konfirmasi-pekerja', [PemberiKerjaController::class, 'konfirmasiPekerja'])->name('konfirmasi-pekerja');
         
         // Lowongan Routes
@@ -71,19 +75,29 @@ Route::middleware(['auth'])->group(function () {
         // Pekerjaan Routes
         Route::get('/pekerjaan', [PekerjaanController::class, 'index'])->name('pekerjaan.index');
         Route::get('/pekerjaan/{id}', [PekerjaanController::class, 'show'])->name('pekerjaan.detail');
+        Route::get('/profil-pelamar/{id}', [PemberiKerjaController::class, 'profilPelamar'])->name('profil-pelamar');
     });
     
     // Pekerja Routes
     Route::prefix('pekerja')->name('pekerja.')->group(function () {
         Route::get('/dashboard', [PekerjaController::class, 'dashboard'])->name('dashboard');
         Route::get('/pengaturan', [PekerjaController::class, 'pengaturan'])->name('pengaturan');
+        Route::get('/lamaran', [PekerjaController::class, 'lamaran'])->name('lamaran');
+        Route::get('/profil', [PekerjaController::class, 'profil'])->name('profil');
+        Route::get('/profil/{id}', [PekerjaController::class, 'profilPublik'])->name('profil.publik');
+        Route::put('/profil', [PekerjaController::class, 'updateProfil'])->name('profil.update');
         Route::get('/cari-pekerjaan', [PekerjaController::class, 'cariPekerjaan'])->name('cari-pekerjaan');
         Route::get('/lowongan/{id}', [PekerjaController::class, 'detailLowongan'])->name('lowongan.detail');
         Route::post('/lowongan/{id}/lamar', [LamaranController::class, 'lamar'])->name('lowongan.lamar');
-        Route::get('/lamaran', [LamaranController::class, 'index'])->name('lamaran.index');
+        Route::get('/lamaran-list', [LamaranController::class, 'index'])->name('lamaran.index');
+        Route::post('/keahlian', [PekerjaController::class, 'tambahKeahlian'])->name('keahlian.tambah');
     });
     
     // FITUR 8: Rating Routes (untuk kedua pihak)
     Route::post('/rating/beri', [RatingController::class, 'beriRating'])->name('rating.beri');
     Route::get('/rating', [RatingController::class, 'index'])->name('rating.index');
+
+    // Notifikasi Routes
+    Route::post('/notifikasi/mark-read', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.markRead');
+    Route::delete('/notifikasi/delete-all', [NotifikasiController::class, 'deleteAll'])->name('notifikasi.deleteAll');
 });

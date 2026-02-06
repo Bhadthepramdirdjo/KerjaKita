@@ -4,21 +4,48 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PemberiKerjaController extends Controller
 {
+    /**
+     * Helper: Ambil ID Pemberi Kerja dari user yang login
+     */
+    private function getIdPemberiKerja()
+    {
+        $idUser = Auth::id();
+        $pemberiKerja = DB::table('PemberiKerja')->where('idUser', $idUser)->first();
+        
+        if (!$pemberiKerja) {
+            // Jika tidak ada entry PemberiKerja, buat satu
+            $user = Auth::user();
+            if ($user->tipe_user !== 'PemberiKerja' && $user->peran !== 'PemberiKerja') {
+                abort(403, 'User bukan pemberi kerja');
+            }
+            
+            // Buat entry PemberiKerja jika belum ada
+            $id = DB::table('PemberiKerja')->insertGetId([
+                'idUser' => $idUser,
+                'nama_perusahaan' => $user->nama,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            return $id;
+        }
+        
+        return $pemberiKerja->idPemberiKerja;
+    }
+    
     /**
      * Menampilkan Dashboard Pemberi Kerja
      */
     public function dashboard()
     {
-        // 1. Ambil Statistik
-        // Di aplikasi nyata, kita filter berdasarkan ID user yang login
-        // Saat ini kita pakai dummy ID karena belum login
-        $idPemberiKerja = 1; 
-
+        // 1. Ambil ID Pemberi Kerja dari user yang login
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
         // Menggunakan Stored Procedure yang sudah ada di database Anda!
-        // CALL sp_dashboard_pemberi_kerja(1)
+        // CALL sp_dashboard_pemberi_kerja($idPemberiKerja)
         // Namun untuk kompatibilitas Laravel, kita query manual saja agar aman
         
         $stats = [
@@ -42,62 +69,110 @@ class PemberiKerjaController extends Controller
                                 ->count(),
         ];
 
-        // Hitung pekerja yang menunggu konfirmasi
-        $pekerjaMenunggu = DB::table('lamaran')
-            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-            ->leftJoin('pekerjaan', 'lamaran.idLamaran', '=', 'pekerjaan.idLamaran')
-            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
-            ->where('lamaran.status_lamaran', 'diterima')
-            ->whereNull('pekerjaan.idPekerjaan')
-            ->count();
-
-        // 2. Ambil Daftar Pekerjaan (untuk Slider)
-        // Kita ambil pekerjaan yang sedang berjalan atau butuh review
-        $pekerjaan = DB::table('pekerjaan')
-            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
-            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
-            ->join('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
-            ->join('user', 'pekerja.idUser', '=', 'user.idUser') // Ambil nama pekerja
-            ->select(
-                'pekerjaan.idPekerjaan',
-                'pekerjaan.status_pekerjaan',
-                'pekerjaan.tanggal_mulai',
-                'pekerjaan.tanggal_selesai',
-                'lowongan.idLowongan',
-                'lowongan.judul', 
-                'lowongan.upah', 
-                'lowongan.lokasi',
-                'lamaran.idLamaran',
-                'user.nama as nama_pekerja'
-            )
-            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
-            ->orderBy('pekerjaan.created_at', 'desc')
-            ->limit(5)
+        // Ambil notifikasi untuk pemberi kerja
+        $idUser = Auth::id();
+        $notifikasi = DB::table('notifikasi')
+            ->where('idUser', $idUser)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
             ->get();
 
-        // Jika tidak ada pekerjaan aktif, tampilkan lowongan aktif saja
-        if ($pekerjaan->isEmpty()) {
-            $pekerjaan = DB::table('lowongan')
-                ->select(
-                    DB::raw('NULL as idPekerjaan'),
-                    DB::raw('"aktif" as status_pekerjaan'),
-                    DB::raw('NULL as tanggal_mulai'),
-                    DB::raw('NULL as tanggal_selesai'),
-                    'idLowongan',
-                    'judul', 
-                    'upah', 
-                    'lokasi',
-                    DB::raw('NULL as idLamaran'),
-                    DB::raw('"Belum ada pekerja" as nama_pekerja')
-                )
-                ->where('idPemberiKerja', $idPemberiKerja)
-                ->where('status', 'aktif')
-                ->orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get();
+        // 2. Ambil Daftar Lowongan Aktif (untuk Slider)
+        $pekerjaan = DB::table('lowongan')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->where('status', 'aktif')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pemberi-kerja.dashboard', compact('stats', 'pekerjaan', 'notifikasi'));
+    }
+
+    /**
+     * Halaman Profil Pelamar (Read-Only)
+     */
+    public function profilPelamar($id)
+    {
+        // Ambil data pekerja berdasarkan ID Pekerja
+        $pekerja = DB::table('pekerja')
+            ->join('user', 'pekerja.idUser', '=', 'user.idUser')
+            ->where('pekerja.idPekerja', $id)
+            ->select('pekerja.*', 'user.nama', 'user.foto_profil', 'user.email')
+            ->first();
+
+        if (!$pekerja) {
+            abort(404, 'Pekerja tidak ditemukan');
         }
 
-        return view('pemberi-kerja.dashboard', compact('stats', 'pekerjaan', 'pekerjaMenunggu'));
+        // Ambil rating pekerja
+        $ratingData = DB::table('rating')
+            ->join('pekerjaan', 'rating.idPekerjaan', '=', 'pekerjaan.idPekerjaan')
+            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+            ->where('lamaran.idPekerja', $pekerja->idPekerja)
+            ->where('rating.pemberi_rating', 'PemberiKerja')
+            ->select(
+                DB::raw('AVG(rating.nilai_rating) as rating_average'),
+                DB::raw('COUNT(rating.idRating) as total_rating')
+            )
+            ->first();
+
+        $rating = $ratingData->rating_average ?? 0;
+        $totalRating = $ratingData->total_rating ?? 0;
+
+        // Ambil pengalaman kerja (pekerjaan yang sudah selesai)
+        $pengalamanKerja = DB::table('pekerjaan')
+            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+            ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+            ->where('lamaran.idPekerja', $pekerja->idPekerja)
+            ->where('pekerjaan.status_pekerjaan', 'selesai')
+            ->select(
+                'lowongan.judul',
+                'lowongan.deskripsi',
+                'PemberiKerja.nama_perusahaan',
+                'pekerjaan.tanggal_mulai',
+                'pekerjaan.tanggal_selesai',
+                DB::raw('DATEDIFF(pekerjaan.tanggal_selesai, pekerjaan.tanggal_mulai) as durasi_hari')
+            )
+            ->orderBy('pekerjaan.tanggal_selesai', 'desc')
+            ->get()
+            ->map(function($item) {
+                // Format durasi
+                if ($item->durasi_hari) {
+                    if ($item->durasi_hari < 7) {
+                        $item->durasi = $item->durasi_hari . ' hari';
+                    } elseif ($item->durasi_hari < 30) {
+                        $minggu = floor($item->durasi_hari / 7);
+                        $item->durasi = $minggu . ' minggu';
+                    } else {
+                        $bulan = floor($item->durasi_hari / 30);
+                        $item->durasi = $bulan . ' bulan';
+                    }
+                } else {
+                    $item->durasi = '-';
+                }
+                return $item;
+            });
+
+        // Ambil ulasan terbaru
+        $ulasanList = DB::table('rating')
+            ->join('pekerjaan', 'rating.idPekerjaan', '=', 'pekerjaan.idPekerjaan')
+            ->join('lamaran', 'pekerjaan.idLamaran', '=', 'lamaran.idLamaran')
+            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+            ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+            ->join('user', 'PemberiKerja.idUser', '=', 'user.idUser')
+            ->where('lamaran.idPekerja', $pekerja->idPekerja)
+            ->where('rating.pemberi_rating', 'PemberiKerja')
+            ->select(
+                'rating.nilai_rating',
+                'rating.ulasan',
+                'rating.created_at',
+                'lowongan.judul as judul_pekerjaan',
+                'user.nama as nama_pemberi_kerja'
+            )
+            ->orderBy('rating.created_at', 'desc')
+            ->get();
+
+        return view('pemberi-kerja.profil-pelamar', compact('pekerja', 'rating', 'totalRating', 'pengalamanKerja', 'ulasanList'));
     }
     
     /**
@@ -127,10 +202,12 @@ class PemberiKerjaController extends Controller
             'deskripsi' => 'required|string',
             'lokasi' => 'required|string|max:255',
             'upah' => 'required',
-            'status' => 'required|in:aktif,draft'
+            'status' => 'required|in:aktif,draft',
+            'gambar' => 'nullable|array',
+            'gambar.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
         ]);
 
-        $idPemberiKerja = 1; // TODO: Get from auth()->user()
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         // Clean upah value - remove Rp and dots
         $upahValue = preg_replace('/[^0-9]/', '', $validated['upah']);
@@ -141,12 +218,35 @@ class PemberiKerjaController extends Controller
                 ->withErrors(['upah' => 'Upah harus berupa angka']);
         }
 
+        // Handle image upload
+        $gambarPath = null;
+        if ($request->hasFile('gambar') && count($request->file('gambar')) > 0) {
+            $files = $request->file('gambar');
+            $filePath = null;
+            
+            // Process first image only (store as gambar field in lowongan)
+            if (isset($files[0]) && $files[0]->isValid()) {
+                $file = $files[0];
+                
+                // Create folder if not exists
+                if (!\Illuminate\Support\Facades\Storage::disk('public')->exists('lowongan')) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('lowongan');
+                }
+                
+                // Store image
+                $fileName = 'lowongan_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('lowongan', $fileName, 'public');
+                $gambarPath = 'lowongan/' . $fileName;
+            }
+        }
+
         DB::table('lowongan')->insert([
             'idPemberiKerja' => $idPemberiKerja,
             'judul' => $validated['judul'],
             'deskripsi' => $validated['deskripsi'],
             'lokasi' => $validated['lokasi'],
             'upah' => (int) $upahValue,
+            'gambar' => $gambarPath,
             'status' => $validated['status'],
             'created_at' => now(),
             'updated_at' => now()
@@ -173,22 +273,32 @@ class PemberiKerjaController extends Controller
     public function lowonganSaya()
     {
         // Ambil ID pemberi kerja dari user yang login
-        $idPemberiKerja = 1; // TODO: Get from auth()->user()
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
-        // Query lowongan berdasarkan pemberi kerja
-        $lowongan = DB::table('lowongan')
-            ->where('idPemberiKerja', $idPemberiKerja)
-            ->leftJoin('lamaran', 'lowongan.idLowongan', '=', 'lamaran.idLowongan')
-            ->select(
-                'lowongan.idLowongan',
-                'lowongan.judul',
-                'lowongan.lokasi',
-                'lowongan.status',
-                DB::raw('COUNT(lamaran.idLamaran) as total_pelamar')
-            )
-            ->groupBy('lowongan.idLowongan', 'lowongan.judul', 'lowongan.lokasi', 'lowongan.status')
-            ->orderBy('lowongan.created_at', 'desc')
-            ->get();
+        // Reset Notifikasi: Tandai lamaran baru sebagai sudah dibaca saat membuka halaman ini
+        // Sesuai request user: "kalo pemberi kerja udah membuka halaman nya, notif nya hilang"
+        DB::table('lamaran')
+            ->join('lowongan', 'lamaran.idLowongan', '=', 'lowongan.idLowongan')
+            ->where('lowongan.idPemberiKerja', $idPemberiKerja)
+            ->where('lamaran.is_read', false)
+            ->update(['lamaran.is_read' => true]);
+
+    // Query lowongan berdasarkan pemberi kerja
+    $lowongan = DB::table('lowongan')
+        ->where('idPemberiKerja', $idPemberiKerja)
+        ->select(
+            'lowongan.idLowongan',
+            'lowongan.judul',
+            'lowongan.lokasi',
+            'lowongan.status',
+            DB::raw('(SELECT COUNT(DISTINCT l.idLamaran) FROM lamaran l WHERE l.idLowongan = lowongan.idLowongan) as total_pelamar'),
+            DB::raw('(SELECT MAX(p.status_pekerjaan) FROM pekerjaan p INNER JOIN lamaran l ON p.idLamaran = l.idLamaran WHERE l.idLowongan = lowongan.idLowongan) as status_pekerjaan'),
+            DB::raw('(SELECT MAX(p.idPekerjaan) FROM pekerjaan p INNER JOIN lamaran l ON p.idLamaran = l.idLamaran WHERE l.idLowongan = lowongan.idLowongan) as idPekerjaan'),
+            DB::raw('(SELECT COUNT(r.idRating) FROM rating r INNER JOIN pekerjaan p ON r.idPekerjaan = p.idPekerjaan INNER JOIN lamaran l ON p.idLamaran = l.idLamaran WHERE l.idLowongan = lowongan.idLowongan AND r.pemberi_rating = "PemberiKerja") as is_rated'),
+            DB::raw('(SELECT MAX(u.nama) FROM user u INNER JOIN pekerja pk ON u.idUser = pk.idUser INNER JOIN lamaran l ON pk.idPekerja = l.idPekerja INNER JOIN pekerjaan p ON l.idLamaran = p.idLamaran WHERE l.idLowongan = lowongan.idLowongan) as nama_pekerja')
+        )
+        ->orderBy('lowongan.created_at', 'desc')
+        ->get();
 
         return view('pemberi-kerja.lowongan-saya', compact('lowongan'));
     }
@@ -198,7 +308,7 @@ class PemberiKerjaController extends Controller
      */
     public function konfirmasiPekerja()
     {
-        $idPemberiKerja = 1; // TODO: Get from auth()->user()
+        $idPemberiKerja = $this->getIdPemberiKerja();
 
         // Pekerja yang status lamarannya 'diterima' tapi belum ada pekerjaan (menunggu konfirmasi)
         $pekerjaMenunggu = DB::table('lamaran')
@@ -295,5 +405,101 @@ class PemberiKerjaController extends Controller
         });
 
         return view('pemberi-kerja.konfirmasi-pekerja', compact('pekerjaMenunggu', 'pekerjaDikonfirmasi'));
+    }
+
+    /**
+     * Publikasi Draft Lowongan
+     */
+    public function publikasiDraft($idLowongan)
+    {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+
+        // Pastikan lowongan milik pemberi kerja ini dan statusnya draft
+        $lowongan = DB::table('lowongan')
+            ->where('idLowongan', $idLowongan)
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->where('status', 'draft')
+            ->first();
+
+        if (!$lowongan) {
+            return redirect()->route('pemberi-kerja.lowongan-saya')
+                ->with('error', 'Lowongan tidak ditemukan atau sudah dipublikasi');
+        }
+
+        // Update status menjadi aktif
+        DB::table('lowongan')
+            ->where('idLowongan', $idLowongan)
+            ->update([
+                'status' => 'aktif',
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('pemberi-kerja.lowongan-saya')
+            ->with('success', 'Lowongan berhasil dipublikasikan!');
+    }
+
+    /**
+     * Halaman Profil Pemberi Kerja
+     */
+    public function profil()
+    {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        $user = Auth::user();
+        
+        $pemberiKerja = DB::table('PemberiKerja')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->first();
+
+        // Ambil riwayat lowongan
+        $riwayatLowongan = DB::table('lowongan')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pemberi-kerja.profil', compact('user', 'pemberiKerja', 'riwayatLowongan'));
+    }
+
+    /**
+     * Update Profil Pemberi Kerja
+     */
+    public function updateProfil(Request $request)
+    {
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'nama_perusahaan' => 'nullable|string|max:255',
+            'alamat' => 'nullable|string',
+            'no_telp' => 'nullable|string|max:20',
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        // Handle profile picture upload
+        if ($request->hasFile('foto_profil')) {
+            $file = $request->file('foto_profil');
+            $fileName = 'profil_' . $user->idUser . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('profil', $fileName, 'public');
+            
+            // Update user with new foto path
+            DB::table('user')
+                ->where('idUser', $user->idUser)
+                ->update([
+                    'foto_profil' => 'profil/' . $fileName,
+                    'updated_at' => now()
+                ]);
+        }
+
+        // Update pemberi kerja data
+        DB::table('PemberiKerja')
+            ->where('idPemberiKerja', $idPemberiKerja)
+            ->update([
+                'nama_perusahaan' => $validated['nama_perusahaan'],
+                'alamat' => $validated['alamat'],
+                'no_telp' => $validated['no_telp'],
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('pemberi-kerja.profil')
+            ->with('success', 'Profil berhasil diperbarui!');
     }
 }

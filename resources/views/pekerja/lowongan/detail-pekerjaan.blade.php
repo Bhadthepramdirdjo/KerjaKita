@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Detail Pekerjaan - KerjaKita</title>
     
     <!-- Favicon -->
@@ -55,37 +56,44 @@
 </head>
 <body class="text-keel-black h-screen flex overflow-hidden">
 
-    <!-- Sidebar (Floating Style) -->
-    <aside class="w-20 lg:w-24 h-screen flex flex-col items-center py-8 z-50 fixed left-0 top-0 bg-white border-r border-gray-200 shadow-sm">
-        <!-- Settings Icon -->
-        <div class="mb-auto">
-             <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-cog text-2xl"></i>
-            </button>
-        </div>
-        
-        <!-- Center Icons -->
-        <div class="flex flex-col space-y-8">
-            <button class="w-12 h-12 rounded-xl flex items-center justify-center bg-keel-black text-white shadow-lg transform scale-110">
-                <i class="fas fa-home text-xl"></i>
-            </button>
+    <!-- Speed Dial Navigation -->
+    <div id="speed-dial-container" class="fixed top-6 left-6 z-50 flex flex-col items-center gap-4">
+        <!-- Trigger Button (Logo) -->
+        <button id="speed-dial-trigger" class="w-16 h-16 rounded-full bg-white shadow-xl border border-gray-100 flex items-center justify-center relative z-20 transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none">
+             <img src="{{ asset('images/LOGO.png') }}" alt="Menu" class="w-10 h-10 object-contain">
+        </button>
+
+        <!-- Menu Items -->
+        <div id="speed-dial-menu" class="flex flex-col gap-3 items-center opacity-0 -translate-y-4 scale-90 pointer-events-none transition-all duration-300 ease-out origin-top">
+            <!-- Dashboard -->
+            <a href="{{ route('pekerja.dashboard') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Dashboard">
+                <i class="fas fa-home text-lg"></i>
+            </a>
             
-            <button class="w-12 h-12 rounded-xl flex items-center justify-center text-keel-black hover:bg-seafoam-bloom transition-colors">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>
+            <!-- Lamaran Saya -->
+            <a href="{{ route('pekerja.lamaran') }}" class="w-12 h-12 rounded-full bg-keel-black text-white shadow-lg flex items-center justify-center hover:bg-keel-black hover:text-white transition-all duration-200 transform hover:scale-110" title="Lamaran Saya">
+                <i class="fas fa-briefcase text-lg"></i>
+            </a>
+
+            <!-- Profil -->
+            <a href="{{ route('pekerja.profil') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Profil">
+                <i class="fas fa-user text-lg"></i>
+            </a>
+
+            <!-- Pengaturan -->
+            <a href="{{ route('pekerja.pengaturan') }}" class="w-12 h-12 rounded-full bg-white text-keel-black shadow-lg flex items-center justify-center hover:bg-seafoam-bloom hover:text-white transition-all duration-200 transform hover:scale-110" title="Pengaturan">
+                <i class="fas fa-cog text-lg"></i>
+            </a>
         </div>
-        
-        <!-- Bottom Placeholder -->
-        <div class="mt-auto"></div>
-    </aside>
+    </div>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-20 lg:ml-24 flex flex-col h-screen relative">
+    <main class="flex-1 flex flex-col h-screen relative w-full">
         
         <!-- Header Section -->
-        <header class="w-full px-6 py-6 flex items-center gap-4">
+        <header class="w-full px-6 py-6 flex items-center gap-4 pl-28">
             <!-- Back Button -->
-            <a href="{{ route('pekerja.dashboard') }}" class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100 flex-shrink-0">
+            <a href="javascript:history.back()" class="w-10 h-10 rounded-full border-2 border-keel-black flex items-center justify-center hover:bg-gray-100 flex-shrink-0">
                 <i class="fas fa-arrow-left text-keel-black"></i>
             </a>
 
@@ -100,9 +108,13 @@
             </div>
 
             <!-- Profile Icon -->
-            <button class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
-                <i class="far fa-user text-2xl text-keel-black"></i>
-            </button>
+            <a href="{{ route('pekerja.profil') }}" class="w-12 h-12 rounded-full border-2 border-keel-black flex items-center justify-center overflow-hidden bg-white hover:bg-gray-50 flex-shrink-0">
+                @if(auth()->user()->foto_profil)
+                    <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="Foto Profil" class="w-full h-full object-cover">
+                @else
+                    <i class="far fa-user text-2xl text-keel-black"></i>
+                @endif
+            </a>
         </header>
 
         <!-- Page Title -->
@@ -177,9 +189,10 @@
                             <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-3">Gambar Pekerjaan</span>
                             
                             @php
-                                // Untuk sementara, karena belum ada kolom gambar di database
-                                // Nanti bisa diganti dengan data dari database
-                                $gambar = []; // Array kosong, nanti isi dari database
+                                $gambar = [];
+                                if (isset($lowongan->gambar) && $lowongan->gambar) {
+                                    $gambar[] = asset('storage/' . $lowongan->gambar);
+                                }
                             @endphp
                             
                             @if(count($gambar) > 0)
@@ -257,10 +270,27 @@
                             </div>
 
                             <!-- Apply Button -->
-                            <button id="lamarBtn" class="w-full bg-seafoam-bloom hover:bg-shallow-reef text-keel-black font-bold py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                                <i class="fas fa-paper-plane"></i>
-                                <span>Lamar Sekarang</span>
-                            </button>
+                            <!-- Apply Button -->
+                            @if(isset($sudahMelamar) && $sudahMelamar)
+                                <div class="relative group w-full">
+                                    <button disabled class="w-full bg-gray-600 text-white font-bold py-4 px-6 rounded-full cursor-not-allowed flex items-center justify-center gap-2 opacity-80">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Anda sudah melamar ke Lowongan ini</span>
+                                    </button>
+                                    
+                                    <!-- Custom Popover -->
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-64 p-4 bg-keel-black text-white text-sm rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 text-center z-20 border border-gray-700">
+                                        <p class="leading-relaxed">Silahkan tunggu kabar dari <span class="font-bold text-seafoam-bloom">{{ $lowongan->nama_perusahaan ?? $lowongan->nama_pemberi_kerja }}</span></p>
+                                        <!-- Arrow -->
+                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-transparent border-t-keel-black"></div>
+                                    </div>
+                                </div>
+                            @else
+                                <button id="lamarBtn" class="w-full bg-seafoam-bloom hover:bg-shallow-reef text-keel-black font-bold py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Lamar Sekarang</span>
+                                </button>
+                            @endif
 
                             <!-- WhatsApp Contact Button -->
                             @if($lowongan->telp_perusahaan)
@@ -325,6 +355,61 @@
         </div>
     </div>
 
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center transform scale-90 transition-transform duration-300">
+            <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check text-4xl text-green-500"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-keel-black mb-2">Berhasil!</h3>
+            <p class="text-gray-600">Lamaran Anda telah berhasil dikirim.</p>
+        </div>
+    </div>
+
+    <script>
+        // Speed Dial Navigation Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('speed-dial-container');
+            const menu = document.getElementById('speed-dial-menu');
+            const trigger = document.getElementById('speed-dial-trigger');
+            let isLocked = false;
+
+            if (container && menu && trigger) {
+                function toggleMenu() {
+                    isLocked = !isLocked;
+                    if (isLocked) {
+                        menu.classList.remove('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        menu.classList.add('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        trigger.classList.add('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    } else {
+                        menu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                        menu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                        trigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                    }
+                }
+
+                function closeMenu() {
+                    isLocked = false;
+                    menu.classList.remove('opacity-100', 'translate-y-0', 'scale-100', 'pointer-events-auto');
+                    menu.classList.add('opacity-0', '-translate-y-4', 'scale-90', 'pointer-events-none');
+                    trigger.classList.remove('ring-4', 'ring-pelagic-blue', 'ring-opacity-30');
+                }
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+
+                // Close if clicked outside
+                document.addEventListener('click', (e) => {
+                    if (isLocked && !container.contains(e.target)) {
+                        closeMenu();
+                    }
+                });
+            }
+        });
+    </script>
+
     <script>
         // Modal Lamaran
         const lamarBtn = document.getElementById('lamarBtn');
@@ -333,10 +418,12 @@
         const confirmLamar = document.getElementById('confirmLamar');
 
         // Open modal
-        lamarBtn.addEventListener('click', () => {
-            lamaranModal.classList.remove('hidden');
-            lamaranModal.classList.add('flex');
-        });
+        if (lamarBtn) {
+            lamarBtn.addEventListener('click', () => {
+                lamaranModal.classList.remove('hidden');
+                lamaranModal.classList.add('flex');
+            });
+        }
 
         // Close modal
         cancelLamar.addEventListener('click', () => {
@@ -344,16 +431,81 @@
             lamaranModal.classList.remove('flex');
         });
 
-        // Confirm lamaran (nanti akan submit form atau AJAX)
-        confirmLamar.addEventListener('click', () => {
-            // TODO: Implement submit lamaran
-            // Untuk sementara, tampilkan alert
-            alert('Lamaran berhasil dikirim! (Fungsi submit belum diimplementasi)');
+        // Confirm lamaran - Submit ke backend
+        confirmLamar.addEventListener('click', async () => {
+            // Disable button dan tampilkan loading
+            confirmLamar.disabled = true;
+            confirmLamar.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
+            
+            try {
+                // Get CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                
+                // Submit lamaran via AJAX
+                const response = await fetch("{{ route('pekerja.lowongan.lamar', $lowongan->idLowongan) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || '',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        idLowongan: {{ $lowongan->idLowongan }}
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // 1. Close Confirmation Modal
+                    lamaranModal.classList.add('hidden');
+                    lamaranModal.classList.remove('flex');
+
+                    // 2. Show Success Modal
+                    const successModal = document.getElementById('successModal');
+                    successModal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                    successModal.classList.add('flex', 'opacity-100');
+                    
+                    // Animation for content
+                    setTimeout(() => {
+                        const modalContent = successModal.querySelector('div');
+                        modalContent.classList.remove('scale-90');
+                        modalContent.classList.add('scale-100');
+                    }, 10);
+
+                    // 3. Redirect Logic
+                    const redirect = () => {
+                        window.location.href = "{{ route('pekerja.lamaran') }}";
+                    };
+
+                    // Auto redirect after 3s
+                    const timer = setTimeout(redirect, 3000);
+
+                    // Click anywhere to dismiss and redirect immediately
+                    successModal.addEventListener('click', () => {
+                        clearTimeout(timer);
+                        redirect();
+                    }, { once: true });
+                } else {
+                    // Error dari server
+                    alert('❌ ' + (data.message || 'Gagal mengirim lamaran. Silakan coba lagi.'));
+                    
+                    // Reset button
+                    confirmLamar.disabled = false;
+                    confirmLamar.innerHTML = 'Lanjutkan';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Terjadi kesalahan. Silakan coba lagi.');
+                
+                // Reset button
+                confirmLamar.disabled = false;
+                confirmLamar.innerHTML = 'Lanjutkan';
+            }
+            
+            // Close modal
             lamaranModal.classList.add('hidden');
             lamaranModal.classList.remove('flex');
-            
-            // Nanti bisa redirect atau refresh
-            // window.location.href = "{{ route('pekerja.dashboard') }}";
         });
 
         // Close modal when clicking backdrop
@@ -364,6 +516,7 @@
             }
         });
     </script>
+
 
 </body>
 </html>

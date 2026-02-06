@@ -94,6 +94,31 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
         }
 
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper .form-input {
+            padding-right: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #d1d5db;
+            font-size: 14px;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        .toggle-password:hover {
+            color: #fff;
+        }
+
         .remember-me {
             display: flex;
             align-items: center;
@@ -251,13 +276,17 @@
 
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    class="form-input"
-                    placeholder="Masukkan password"
-                    required
-                >
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Masukkan password"
+                        required
+                    >
+                    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                </div>
                 @error('password')
                     <span class="error-message">{{ $message }}</span>
                 @enderror
@@ -289,5 +318,21 @@
             Belum punya akun? <a href="{{ route('register') }}">daftar disini</a>
         </div>
     </div>
+
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the icon
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 </html>

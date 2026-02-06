@@ -264,11 +264,11 @@
                                 @endfor
                             </div>
                         </div>
-                        @if($rating->komentar)
-                        <p class="text-sm text-gray-600 italic">"{{ $rating->komentar }}"</p>
+                        @if($rating->ulasan)
+                        <p class="text-sm text-gray-600 italic">"{{ $rating->ulasan }}"</p>
                         @endif
                         <p class="text-xs text-gray-500 mt-2">
-                            Diberikan pada {{ \Carbon\Carbon::parse($rating->tanggal_rating)->format('d M Y, H:i') }}
+                            Diberikan pada {{ \Carbon\Carbon::parse($rating->created_at)->format('d M Y, H:i') }}
                         </p>
                     </div>
                     @else
@@ -313,8 +313,8 @@
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Komentar (Opsional)</label>
-                    <textarea name="komentar" rows="4" class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pelagic-blue" placeholder="Tulis komentar Anda..."></textarea>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Ulasan (Opsional)</label>
+                    <textarea name="ulasan" rows="4" class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pelagic-blue" placeholder="Tulis ulasan Anda..."></textarea>
                 </div>
 
                 <div class="flex gap-3">

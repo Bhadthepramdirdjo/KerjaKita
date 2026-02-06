@@ -91,6 +91,31 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
         }
 
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper .form-input {
+            padding-right: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #d1d5db;
+            font-size: 14px;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        .toggle-password:hover {
+            color: #fff;
+        }
+
         .form-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -242,6 +267,21 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        class="form-input"
+                        placeholder="Username"
+                        value="{{ old('username') }}"
+                        required
+                    >
+                    @error('username')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Email</label>
                     <input
                         type="email"
@@ -257,8 +297,6 @@
                 </div>
 
                 <div class="form-group">
-<<<<<<< HEAD
-=======
                     <label class="form-label">No HP</label>
                     <input
                         type="text"
@@ -287,15 +325,18 @@
                 </div>
 
                 <div class="form-group">
->>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
                     <label class="form-label">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        class="form-input"
-                        placeholder="Password"
-                        required
-                    >
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="form-input"
+                            placeholder="Password"
+                            required
+                        >
+                        <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
                     @error('password')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
@@ -303,44 +344,17 @@
 
                 <div class="form-group">
                     <label class="form-label">Konfirmasi Password</label>
-<<<<<<< HEAD
-                    <input
-                        type="password"
-                        name="password_confirmation"
-                        class="form-input"
-                        placeholder="Konfirmasi Password"
-                        required
-                    >
-                    @error('password_confirmation')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Alamat Lengkap</label>
-                    <input
-                        type="text"
-                        name="alamat"
-                        class="form-input"
-                        placeholder="Alamat"
-                        value="{{ old('alamat') }}"
-                    >
-                    @error('alamat')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">No Hp</label>
-=======
->>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
-                    <input
-                        type="password"
-                        name="password_confirmation"
-                        class="form-input"
-                        placeholder="Konfirmasi Password"
-                        required
-                    >
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            id="password_confirmation"
+                            class="form-input"
+                            placeholder="Konfirmasi Password"
+                            required
+                        >
+                        <i class="fas fa-eye toggle-password" id="togglePasswordConfirmation"></i>
+                    </div>
                 </div>
             </div>
 
@@ -410,11 +424,7 @@
                 Daftar sekarang
             </button>
 
-<<<<<<< HEAD
-            <a href="{{ url('/') }}" class="back-btn">
-=======
             <a href="{{ route('home') }}" class="back-btn">
->>>>>>> f38403c739a993e9f6be19c0c706f8bbaee95c94
                 Kembali ke Dashboard
             </a>
         </form>
@@ -423,5 +433,35 @@
             Sudah punya akun? klik <a href="{{ route('login') }}">login disini</a>
         </div>
     </div>
+
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the icon
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Toggle Password Confirmation Visibility
+        const togglePasswordConfirmation = document.getElementById('togglePasswordConfirmation');
+        const passwordConfirmationInput = document.getElementById('password_confirmation');
+
+        togglePasswordConfirmation.addEventListener('click', function() {
+            // Toggle the type attribute
+            const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordConfirmationInput.setAttribute('type', type);
+            
+            // Toggle the icon
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 </html>

@@ -4,31 +4,61 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class LamaranController extends Controller
 {
+    /**
+     * Helper: Ambil ID Pemberi Kerja dari user yang login
+     */
+    private function getIdPemberiKerja()
+    {
+        $idUser = Auth::id();
+        $pemberiKerja = DB::table('PemberiKerja')->where('idUser', $idUser)->first();
+        
+        if (!$pemberiKerja) {
+            // Jika tidak ada entry PemberiKerja, buat satu
+            $user = Auth::user();
+            if ($user->tipe_user !== 'PemberiKerja' && $user->peran !== 'PemberiKerja') {
+                abort(403, 'User bukan pemberi kerja');
+            }
+            
+            // Buat entry PemberiKerja jika belum ada
+            $id = DB::table('PemberiKerja')->insertGetId([
+                'idUser' => $idUser,
+                'nama_perusahaan' => $user->nama,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            return $id;
+        }
+        
+        return $pemberiKerja->idPemberiKerja;
+    }
+    
     /**
      * FITUR 5: Lihat Pelamar
      * Menampilkan daftar pelamar untuk lowongan tertentu
      */
     public function pelamar($id)
     {
+        // Pastikan pemberi kerja hanya bisa lihat lowongan miliknya
+        $idPemberiKerja = $this->getIdPemberiKerja();
+        
         // Ambil data lowongan
         $lowongan = DB::table('lowongan')
             ->where('idLowongan', $id)
+            ->where('idPemberiKerja', $idPemberiKerja)
             ->first();
 
         if (!$lowongan) {
-            return redirect()->route('pemberi-kerja.lowongan-saya')
-                ->with('error', 'Lowongan tidak ditemukan');
+            abort(403, 'Anda tidak memiliki akses ke lowongan ini');
         }
 
-        // Ambil daftar pelamar dengan detail profil
+        // Ambil daftar pelamar dengan detail profil dan rating
         $pelamar = DB::table('lamaran')
             ->join('pekerja', 'lamaran.idPekerja', '=', 'pekerja.idPekerja')
             ->join('user', 'pekerja.idUser', '=', 'user.idUser')
-            ->leftJoin('pekerjaan', 'lamaran.idLamaran', '=', 'pekerjaan.idLamaran')
-            ->leftJoin('rating', 'pekerjaan.idPekerjaan', '=', 'rating.idPekerjaan')
             ->select(
                 'lamaran.*',
                 'user.nama',
@@ -37,28 +67,25 @@ class LamaranController extends Controller
                 'pekerja.pengalaman',
                 'pekerja.alamat',
                 'pekerja.no_telp',
-                DB::raw('COALESCE(AVG(rating.nilai_rating), 0) as rating_avg'),
-                DB::raw('COUNT(DISTINCT rating.idRating) as total_rating')
+                DB::raw('(
+                    SELECT COALESCE(AVG(r.nilai_rating), 0)
+                    FROM rating r
+                    INNER JOIN pekerjaan p ON r.idPekerjaan = p.idPekerjaan
+                    INNER JOIN lamaran l ON p.idLamaran = l.idLamaran
+                    WHERE l.idPekerja = pekerja.idPekerja
+                ) as rating_avg'),
+                DB::raw('(
+                    SELECT COUNT(DISTINCT r.idRating)
+                    FROM rating r
+                    INNER JOIN pekerjaan p ON r.idPekerjaan = p.idPekerjaan
+                    INNER JOIN lamaran l ON p.idLamaran = l.idLamaran
+                    WHERE l.idPekerja = pekerja.idPekerja
+                ) as total_rating')
             )
             ->where('lamaran.idLowongan', $id)
-            ->groupBy(
-                'lamaran.idLamaran',
-                'lamaran.idPekerja',
-                'lamaran.idLowongan',
-                'lamaran.status_lamaran',
-                'lamaran.tanggal_lamaran',
-                'lamaran.created_at',
-                'lamaran.updated_at',
-                'user.nama',
-                'user.email',
-                'pekerja.keahlian',
-                'pekerja.pengalaman',
-                'pekerja.alamat',
-                'pekerja.no_telp'
-            )
             ->orderByRaw("
                 CASE 
-                    WHEN lamaran.status_lamaran = 'menunggu' THEN 1
+                    WHEN lamaran.status_lamaran = 'pending' THEN 1
                     WHEN lamaran.status_lamaran = 'diterima' THEN 2
                     WHEN lamaran.status_lamaran = 'ditolak' THEN 3
                 END
@@ -85,7 +112,7 @@ class LamaranController extends Controller
                 return redirect()->back()->with('error', 'Lamaran tidak ditemukan');
             }
 
-            if ($lamaran->status_lamaran !== 'menunggu') {
+            if ($lamaran->status_lamaran !== 'pending') {
                 return redirect()->back()->with('error', 'Lamaran sudah diproses sebelumnya');
             }
 
@@ -111,7 +138,7 @@ class LamaranController extends Controller
             DB::table('lamaran')
                 ->where('idLowongan', $lamaran->idLowongan)
                 ->where('idLamaran', '!=', $id)
-                ->where('status_lamaran', 'menunggu')
+                ->where('status_lamaran', 'pending')
                 ->update([
                     'status_lamaran' => 'ditolak',
                     'updated_at' => now()
@@ -125,15 +152,35 @@ class LamaranController extends Controller
                     'updated_at' => now()
                 ]);
 
+            // 5b. Masukkan ke tabel Pekerjaan (create job entry)
+            DB::table('pekerjaan')->insert([
+                'idLamaran' => $lamaran->idLamaran,
+                'status_pekerjaan' => 'berjalan',
+                'tanggal_mulai' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            // Info Lowongan untuk Notifikasi
+            $infoLowongan = DB::table('lowongan')
+                ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+                ->join('user', 'PemberiKerja.idUser', '=', 'user.idUser')
+                ->where('lowongan.idLowongan', $lamaran->idLowongan)
+                ->select('lowongan.judul', 'user.nama as nama_perusahaan')
+                ->first();
+                
+            $judul = $infoLowongan->judul ?? 'Pekerjaan';
+            $perusahaan = $infoLowongan->nama_perusahaan ?? 'Pemberi Kerja';
+            $link = route('pekerja.lowongan.detail', $lamaran->idLowongan);
+
             // 6. Buat notifikasi untuk pekerja yang diterima
             $pekerja = DB::table('pekerja')->where('idPekerja', $lamaran->idPekerja)->first();
             DB::table('notifikasi')->insert([
                 'idUser' => $pekerja->idUser,
-                'judul' => 'Lamaran Anda Diterima!',
-                'pesan' => 'Selamat! Lamaran Anda telah diterima. Silakan hubungi pemberi kerja untuk detail lebih lanjut.',
-                'status_baca' => 0,
-                'created_at' => now(),
-                'updated_at' => now()
+                'pesan' => "Selamat! Lamaran Anda untuk <strong>{$judul}</strong> di <strong>{$perusahaan}</strong> telah diterima. <br><a href='{$link}' class='text-pelagic-blue font-bold hover:underline mt-1 inline-block'>Lihat Detail</a>",
+                'is_read' => false,
+                'tipe_notifikasi' => 'terima_lamaran',
+                'created_at' => now()
             ]);
 
             // 7. Buat notifikasi untuk pelamar yang ditolak
@@ -150,11 +197,10 @@ class LamaranController extends Controller
                 
                 DB::table('notifikasi')->insert([
                     'idUser' => $pekerjaData->idUser,
-                    'judul' => 'Update Lamaran',
-                    'pesan' => 'Maaf, lamaran Anda tidak dapat kami terima kali ini. Tetap semangat mencari pekerjaan lainnya!',
-                    'status_baca' => 0,
-                    'created_at' => now(),
-                    'updated_at' => now()
+                    'pesan' => "Maaf, lamaran Anda untuk <strong>{$judul}</strong> di <strong>{$perusahaan}</strong> belum diterima kali ini. Tetap semangat!",
+                    'is_read' => false,
+                    'tipe_notifikasi' => 'tolak_lamaran',
+                    'created_at' => now()
                 ]);
             }
 
@@ -186,7 +232,7 @@ class LamaranController extends Controller
                 return redirect()->back()->with('error', 'Lamaran tidak ditemukan');
             }
 
-            if ($lamaran->status_lamaran !== 'menunggu') {
+            if ($lamaran->status_lamaran !== 'pending') {
                 return redirect()->back()->with('error', 'Lamaran sudah diproses sebelumnya');
             }
 
@@ -199,14 +245,25 @@ class LamaranController extends Controller
                 ]);
 
             // 3. Buat notifikasi untuk pekerja
+            
+            // Ambil info lowongan dulu
+            $infoLowongan = DB::table('lowongan')
+                ->join('PemberiKerja', 'lowongan.idPemberiKerja', '=', 'PemberiKerja.idPemberiKerja')
+                ->join('user', 'PemberiKerja.idUser', '=', 'user.idUser')
+                ->where('lowongan.idLowongan', $lamaran->idLowongan)
+                ->select('lowongan.judul', 'user.nama as nama_perusahaan')
+                ->first();
+                
+            $judul = $infoLowongan->judul ?? 'Pekerjaan';
+            $perusahaan = $infoLowongan->nama_perusahaan ?? 'Pemberi Kerja';
+
             $pekerja = DB::table('pekerja')->where('idPekerja', $lamaran->idPekerja)->first();
             DB::table('notifikasi')->insert([
                 'idUser' => $pekerja->idUser,
-                'judul' => 'Update Lamaran',
-                'pesan' => 'Maaf, lamaran Anda tidak dapat kami terima kali ini. Tetap semangat!',
-                'status_baca' => 0,
-                'created_at' => now(),
-                'updated_at' => now()
+                'pesan' => "Maaf, lamaran Anda untuk <strong>{$judul}</strong> di <strong>{$perusahaan}</strong> telah ditolak.",
+                'is_read' => false,
+                'tipe_notifikasi' => 'tolak_lamaran',
+                'created_at' => now()
             ]);
 
             DB::commit();
@@ -233,7 +290,61 @@ class LamaranController extends Controller
      */
     public function lamar(Request $request, $id)
     {
-        // TODO: Implementasi untuk pekerja melamar pekerjaan
-        return redirect()->back()->with('success', 'Lamaran berhasil dikirim!');
+        try {
+            $idUser = auth()->user()->idUser ?? null;
+            
+            if (!$idUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda harus login terlebih dahulu'
+                ], 401);
+            }
+            
+            // Cari idPekerja dari user yang login
+            $pekerja = DB::table('pekerja')
+                ->where('idUser', $idUser)
+                ->first();
+                
+            if (!$pekerja) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak terdaftar sebagai pekerja'
+                ], 403);
+            }
+            
+            // Cek apakah sudah pernah melamar
+            $sudahLamar = DB::table('lamaran')
+                ->where('idLowongan', $id)
+                ->where('idPekerja', $pekerja->idPekerja)
+                ->exists();
+                
+            if ($sudahLamar) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda sudah pernah melamar pekerjaan ini'
+                ], 400);
+            }
+            
+            // Insert lamaran baru
+            DB::table('lamaran')->insert([
+                'idLowongan' => $id,
+                'idPekerja' => $pekerja->idPekerja,
+                'tanggal_lamaran' => now()->format('Y-m-d'),
+                'status_lamaran' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Lamaran berhasil dikirim!'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
